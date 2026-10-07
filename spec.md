@@ -9,7 +9,7 @@
 | **Abgabe**    | Übelhör, 25.11.2026                                                             |
 | **Bewertung** | 50 % Dokumentation, 50 % Präsentation                                           |
 | **Team**      | Robin, Timo, Magnus, Michi                                                      |
-| **Logo**      | Das „o" in Lector als Fokuspunkt (Optimal Recognition Point, rot hervorgehoben) |
+| **Logo**      | Das „o" in Lector als Fokuspunkt (Optimal Recognition Point, burgunderrot)      |
 
 ### Interne Einteilung (C-Level)
 
