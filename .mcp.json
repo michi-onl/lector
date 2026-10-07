@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "planka": {
+      "command": "sh",
+      "args": ["-c", "set -a; . ./.env; set +a; exec npx -y @chmald/planka-mcp@2.0.4"],
+      "env": {
+        "PLANKA_BASE_URL": "https://planka.michi.onl"
+      }
+    }
+  }
+}

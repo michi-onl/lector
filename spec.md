@@ -103,7 +103,7 @@ Freemium mit Abo (Preise als Entwurf, durch Marketing/Finanzen zu validieren):
 | Baustein                       | Geplant                                                                     |
 | ------------------------------ | --------------------------------------------------------------------------- |
 | Frontend & SSR                 | SvelteKit (`@sveltejs/adapter-cloudflare`)                                  |
-| Komponenten shadcn-svelte init | b4ccpaAOGu oder b4ccpbrxU9                                                  |
+| Komponenten shadcn-svelte init | b4ccpaAOGu oder b4ccpbrxU9 Burgundy Accent, Claude Beige im Hintergrund     |
 | Backend                        | Cloudflare Workers                                                          |
 | Datenbank                      | Cloudflare D1 (Accounts, Bibliothek, Fortschritt)                           |
 | Dateispeicher                  | Cloudflare R2 (hochgeladene Dokumente)                                      |
