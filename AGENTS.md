@@ -8,6 +8,17 @@ Student project (DHBW): an RSVP speed reader whose speed is calibrated by compre
 - The Planka board tracks who does what and how far it is. When the spec and the board disagree, point out the difference to the user rather than silently picking one.
 - `Fovea/` is the old React/Vite/Capacitor app, gitignored and local only. Use it as reference for the import pipeline and RSVP logic; build new code in SvelteKit on Cloudflare as the spec says.
 
+## Code
+
+SvelteKit 3 (Svelte 5 runes, TypeScript) on Cloudflare Workers, Tailwind 4, shadcn-svelte. Use npm.
+
+- Before committing, run `npm run check`, `npm run lint` and `npm test`. `npm run build` must pass too.
+- Kit config lives in `vite.config.ts`; there is no `svelte.config.js`.
+- `#lib/*` replaces `$lib`. Subpath imports don't resolve folders, so import barrels with their full path: `#lib/components/ui/button/index.js`.
+- `npm install <pkg>` removes `node_modules/$app`, and then `tsconfig.json` can't resolve `$app/tsconfig`. Run `npx svelte-kit sync` afterwards (plain `npm install` does it via `prepare`).
+- Add UI components with `npx shadcn-svelte add <name>`; the theme preset is locked in `components.json`.
+- After editing `wrangler.jsonc` (D1/R2 bindings), run `npm run gen` and commit `worker-configuration.d.ts`.
+
 ## Language
 
 Spec, board cards and all project content are German. Use German typography („…", –) and paired gender forms („Juristinnen und Juristen") as `SPEC.md` does. Chat with the user in whatever language they write.
