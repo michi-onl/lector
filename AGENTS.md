@@ -18,6 +18,7 @@ SvelteKit 3 (Svelte 5 runes, TypeScript) on Cloudflare Workers, Tailwind 4, shad
 - `npm install <pkg>` removes `node_modules/$app`, and then `tsconfig.json` can't resolve `$app/tsconfig`. Run `npx svelte-kit sync` afterwards (plain `npm install` does it via `prepare`).
 - Add UI components with `npx shadcn-svelte add <name>`; the theme preset is locked in `components.json`.
 - After editing `wrangler.jsonc` (D1/R2 bindings), run `npm run gen` and commit `worker-configuration.d.ts`.
+- `npm run gen` ignores `.env` (it holds only the Planka key) and clears `.svelte-kit/cloudflare`, so the types match the Cloudflare build. Put local Worker secrets in `.dev.vars`.
 
 ## Language
 
