@@ -1,6 +1,6 @@
 # Lector
 
-Student project (DHBW, due 25.11.2026): an RSVP speed reader whose speed is calibrated by comprehension quizzes. Grading is 50 % documentation, 50 % presentation, so docs and pitch material count as much as code.
+Student project (DHBW): an RSVP speed reader whose speed is calibrated by comprehension quizzes. Grading is 50 % documentation, 50 % presentation, so docs and pitch material count as much as code.
 
 ## Sources of truth
 

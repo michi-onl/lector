@@ -4,12 +4,12 @@
 
 ## Rahmen
 
-|               |                                                                                 |
-| ------------- | ------------------------------------------------------------------------------- |
-| **Abgabe**    | Übelhör, 25.11.2026                                                             |
-| **Bewertung** | 50 % Dokumentation, 50 % Präsentation                                           |
-| **Team**      | Robin, Timo, Magnus, Michi                                                      |
-| **Logo**      | Das „o" in Lector als Fokuspunkt (Optimal Recognition Point, burgunderrot)      |
+|               |                                                                            |
+| ------------- | -------------------------------------------------------------------------- |
+| **Abgabe**    | Übelhör                                                                    |
+| **Bewertung** | 50 % Dokumentation, 50 % Präsentation                                      |
+| **Team**      | Robin, Timo, Magnus, Michi                                                 |
+| **Logo**      | Das „o" in Lector als Fokuspunkt (Optimal Recognition Point, burgunderrot) |
 
 ### Interne Einteilung (C-Level)
 
@@ -103,7 +103,7 @@ Freemium mit Abo (Preise als Entwurf, durch Marketing/Finanzen zu validieren):
 | Baustein                       | Geplant                                                                     |
 | ------------------------------ | --------------------------------------------------------------------------- |
 | Frontend & SSR                 | SvelteKit (`@sveltejs/adapter-cloudflare`)                                  |
-| Komponenten shadcn-svelte init | b4ccpaAOGu oder b4ccpbrxU9 Burgundy Accent, Claude Beige im Hintergrund     |
+| Komponenten shadcn-svelte init | --preset b4W4IuaMZE                                                         |
 | Backend                        | Cloudflare Workers                                                          |
 | Datenbank                      | Cloudflare D1 (Accounts, Bibliothek, Fortschritt)                           |
 | Dateispeicher                  | Cloudflare R2 (hochgeladene Dokumente)                                      |
