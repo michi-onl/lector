@@ -2,15 +2,13 @@
 // for information about these interfaces
 declare global {
 	namespace App {
-		interface Platform {
-			env: Env;
-			ctx: ExecutionContext;
-			caches: CacheStorage;
-			cf?: IncomingRequestCfProperties;
-		}
+		// adapter-cloudflare 8 sets no platform: read bindings from `cloudflare:workers`.
 
 		// interface Error {}
-		// interface Locals {}
+		interface Locals {
+			user: import('#lib/server/auth.js').AuthSession['user'] | null;
+			session: import('#lib/server/auth.js').AuthSession['session'] | null;
+		}
 		// interface PageData {}
 		// interface PageState {}
 	}

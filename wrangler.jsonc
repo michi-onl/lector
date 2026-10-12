@@ -15,6 +15,16 @@
 			"migrations_dir": "migrations"
 		}
 	],
+	"r2_buckets": [
+		{
+			"binding": "DOCUMENTS",
+			"bucket_name": "lector-documents",
+			"jurisdiction": "eu"
+		}
+	],
+	"secrets": {
+		"required": ["BETTER_AUTH_SECRET"]
+	},
 	"workers_dev": true,
 	"preview_urls": true
 }
