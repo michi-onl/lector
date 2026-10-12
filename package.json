@@ -28,6 +28,7 @@
 		"@types/node": "^24",
 		"bits-ui": "^2.19.5",
 		"cn": "^0.4.0",
+		"drizzle-kit": "^0.31.11",
 		"eslint": "^10.4.1",
 		"eslint-config-prettier": "^10.1.8",
 		"eslint-plugin-svelte": "^3.19.0",
@@ -51,5 +52,14 @@
 	"imports": {
 		"#lib": "./src/lib/index.js",
 		"#lib/*": "./src/lib/*"
+	},
+	"overrides": {
+		"better-auth": {
+			"@sveltejs/kit": "$@sveltejs/kit"
+		}
+	},
+	"dependencies": {
+		"better-auth": "^1.7.7",
+		"drizzle-orm": "^0.45.4"
 	}
 }

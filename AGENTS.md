@@ -18,6 +18,8 @@ SvelteKit 3 (Svelte 5 runes, TypeScript) on Cloudflare Workers, Tailwind 4, shad
 - `npm install <pkg>` removes `node_modules/$app`, and then `tsconfig.json` can't resolve `$app/tsconfig`. Run `npx svelte-kit sync` afterwards (plain `npm install` does it via `prepare`).
 - Add UI components with `npx shadcn-svelte add <name>`; the theme preset is locked in `components.json`.
 - After editing `wrangler.jsonc` (D1/R2 bindings), run `npm run gen` and commit `worker-configuration.d.ts`.
+- The D1 schema lives in `src/lib/server/db/schema.ts` (Drizzle). After changing it, run `npx drizzle-kit generate --name <change>` and commit the new file in `migrations/`; apply it with `npx wrangler d1 migrations apply lector --local` (`--remote` only after asking). Never edit a migration that has been applied remotely.
+- The tables `user`, `session`, `account` and `verification` belong to Better Auth: keep their export and property names. Better Auth only allows Kit 2 as a peer, so `overrides` in `package.json` pins it to our Kit; drop the override once Better Auth supports Kit 3.
 - `npm run gen` ignores `.env` (it holds only the Planka key) and clears `.svelte-kit/cloudflare`, so the types match the Cloudflare build. Put local Worker secrets in `.dev.vars`.
 
 ## Language
