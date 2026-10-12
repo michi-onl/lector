@@ -12,6 +12,7 @@
 		{
 			"binding": "DB",
 			"database_name": "lector",
+			"database_id": "1422de46-bca4-444e-b912-f6ae660fc1bc",
 			"migrations_dir": "migrations"
 		}
 	],
