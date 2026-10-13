@@ -1,10 +1,12 @@
 <script lang="ts">
+	import { loadProfile, type StoredProfile } from '#lib/calibration/index.js';
 	import Reader from '#lib/components/reader/reader.svelte';
 	import { Button } from '#lib/components/ui/button/index.js';
 	import { Label } from '#lib/components/ui/label/index.js';
 	import { DEFAULT_READING_SETTINGS, textBlocks, type TextBlock } from '#lib/reader/index.js';
 	import PencilSimple from 'phosphor-svelte/lib/PencilSimple';
 	import Play from 'phosphor-svelte/lib/Play';
+	import { onMount } from 'svelte';
 
 	let text = $state(
 		[
@@ -15,6 +17,12 @@
 	);
 	let settings = $state({ ...DEFAULT_READING_SETTINGS });
 	let blocks = $state.raw<TextBlock[]>();
+	let profile = $state.raw<StoredProfile | null>(null);
+
+	onMount(() => {
+		profile = loadProfile(localStorage);
+		if (profile) settings.targetWpm = profile.targetWpm;
+	});
 
 	const empty = $derived(!text.trim());
 </script>
@@ -53,7 +61,18 @@
 				rows="12"
 				class="w-full min-w-0 rounded-3xl border border-input bg-input/30 px-4 py-3 text-base transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
 				placeholder="Artikel, Skript oder Kapitel hier einfügen …"></textarea>
-			<Button type="submit" class="self-start" disabled={empty}><Play />Lesen</Button>
+			<div class="flex flex-wrap items-center gap-x-4 gap-y-2">
+				<Button type="submit" disabled={empty}><Play />Lesen</Button>
+				<p class="text-sm text-muted-foreground">
+					{#if profile}
+						Kalibriert auf {profile.targetWpm} WPM ·
+						<a href="/kalibrierung" class="underline underline-offset-4">neu kalibrieren</a>
+					{:else}
+						<a href="/kalibrierung" class="underline underline-offset-4">Tempo kalibrieren</a>
+						und mit dem Tempo lesen, das dein Verständnis trägt
+					{/if}
+				</p>
+			</div>
 		</form>
 	{/if}
 </main>

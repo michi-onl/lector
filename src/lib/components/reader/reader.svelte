@@ -27,8 +27,15 @@
 	let {
 		blocks,
 		settings = $bindable(),
+		locked = false,
 		oncomplete
-	}: { blocks: TextBlock[]; settings: ReadingSettings; oncomplete?: () => void } = $props();
+	}: {
+		blocks: TextBlock[];
+		settings: ReadingSettings;
+		/** Calibration: the speed stays as set and the text reads once, without rewinds. */
+		locked?: boolean;
+		oncomplete?: () => void;
+	} = $props();
 
 	const units = $derived(buildPresentation(blocks, settings.chunkSize));
 	let reader = $state.raw<ReaderState>({ index: 0, phase: { kind: 'ready' } });
@@ -58,6 +65,7 @@
 
 	/** The spec's sentence rewind: one tap jumps back to the start of the sentence. */
 	function rewind() {
+		if (locked) return;
 		command({ type: 'jump', direction: -1, level: 'sentence' });
 	}
 
@@ -95,7 +103,8 @@
 		if (control && !control.hasAttribute('data-reader-stage')) return;
 		if (event.key === ' ') toggle();
 		else if (event.key === 'ArrowLeft') rewind();
-		else if (event.key === 'ArrowRight') command({ type: 'jump', direction: 1, level: 'sentence' });
+		else if (event.key === 'ArrowRight' && !locked)
+			command({ type: 'jump', direction: 1, level: 'sentence' });
 		else return;
 		event.preventDefault();
 	}
@@ -107,8 +116,8 @@
 	<button
 		type="button"
 		class="relative cursor-pointer rounded-lg bg-muted py-14 font-heading text-4xl text-foreground outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 sm:text-5xl"
-		onclick={rewind}
-		aria-label="Zum Satzanfang springen"
+		onclick={locked ? toggle : rewind}
+		aria-label={locked ? 'Lesen oder pausieren' : 'Zum Satzanfang springen'}
 		data-reader-stage
 	>
 		<span class="absolute top-4 left-1/2 h-4 w-px bg-border"></span>
@@ -132,49 +141,55 @@
 			{#if running}<Pause />Pause{:else if completed}<ArrowCounterClockwise />Noch einmal{:else}<Play
 				/>Lesen{/if}
 		</Button>
-		<Button variant="secondary" onclick={rewind} disabled={completed}>
-			<SkipBack />Satzanfang
-		</Button>
-		<Button variant="ghost" onclick={restart} disabled={reader.index === 0 && !completed}>
-			<ArrowCounterClockwise />Von vorn
-		</Button>
+		{#if !locked}
+			<Button variant="secondary" onclick={rewind} disabled={completed}>
+				<SkipBack />Satzanfang
+			</Button>
+			<Button variant="ghost" onclick={restart} disabled={reader.index === 0 && !completed}>
+				<ArrowCounterClockwise />Von vorn
+			</Button>
+		{:else}
+			<span class="text-sm text-muted-foreground tabular-nums">{settings.targetWpm} WPM</span>
+		{/if}
 	</div>
 
-	<div class="grid gap-6 sm:grid-cols-[1fr_auto_auto] sm:items-center">
-		<div class="flex items-center gap-3">
-			<Label class="shrink-0 text-muted-foreground">Tempo</Label>
-			<Slider
-				type="single"
-				bind:value={settings.targetWpm}
-				min={MINIMUM_WPM}
-				max={MAXIMUM_WPM}
-				step={10}
-				aria-label="Tempo in Wörtern pro Minute"
-			/>
-			<span class="w-20 shrink-0 text-right text-sm tabular-nums">{settings.targetWpm} WPM</span>
+	{#if !locked}
+		<div class="grid gap-6 sm:grid-cols-[1fr_auto_auto] sm:items-center">
+			<div class="flex items-center gap-3">
+				<Label class="shrink-0 text-muted-foreground">Tempo</Label>
+				<Slider
+					type="single"
+					bind:value={settings.targetWpm}
+					min={MINIMUM_WPM}
+					max={MAXIMUM_WPM}
+					step={10}
+					aria-label="Tempo in Wörtern pro Minute"
+				/>
+				<span class="w-20 shrink-0 text-right text-sm tabular-nums">{settings.targetWpm} WPM</span>
+			</div>
+			<div class="flex items-center gap-3">
+				<Switch
+					id="adaptive"
+					checked={settings.speedMode === 'adaptive'}
+					onCheckedChange={(checked) => (settings.speedMode = checked ? 'adaptive' : 'fixed')}
+				/>
+				<Label for="adaptive">Adaptives Tempo</Label>
+			</div>
+			<RadioGroup.Root
+				class="flex items-center gap-4"
+				value={String(settings.chunkSize)}
+				onValueChange={setChunkSize}
+				aria-label="Wörter pro Anzeige"
+			>
+				{#each [1, 2, 3] as size (size)}
+					<div class="flex items-center gap-2">
+						<RadioGroup.Item value={String(size)} id="chunk-{size}" />
+						<Label for="chunk-{size}" class="font-normal">
+							{size === 1 ? '1 Wort' : `${size} Wörter`}
+						</Label>
+					</div>
+				{/each}
+			</RadioGroup.Root>
 		</div>
-		<div class="flex items-center gap-3">
-			<Switch
-				id="adaptive"
-				checked={settings.speedMode === 'adaptive'}
-				onCheckedChange={(checked) => (settings.speedMode = checked ? 'adaptive' : 'fixed')}
-			/>
-			<Label for="adaptive">Adaptives Tempo</Label>
-		</div>
-		<RadioGroup.Root
-			class="flex items-center gap-4"
-			value={String(settings.chunkSize)}
-			onValueChange={setChunkSize}
-			aria-label="Wörter pro Anzeige"
-		>
-			{#each [1, 2, 3] as size (size)}
-				<div class="flex items-center gap-2">
-					<RadioGroup.Item value={String(size)} id="chunk-{size}" />
-					<Label for="chunk-{size}" class="font-normal">
-						{size === 1 ? '1 Wort' : `${size} Wörter`}
-					</Label>
-				</div>
-			{/each}
-		</RadioGroup.Root>
-	</div>
+	{/if}
 </div>
