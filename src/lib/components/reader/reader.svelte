@@ -22,23 +22,34 @@
 	import Pause from 'phosphor-svelte/lib/Pause';
 	import Play from 'phosphor-svelte/lib/Play';
 	import SkipBack from 'phosphor-svelte/lib/SkipBack';
+	import type { ReadingUpdate } from '#lib/library/index.js';
+	import { untrack } from 'svelte';
 	import AnchorWord from './anchor-word.svelte';
 
 	let {
 		blocks,
 		settings = $bindable(),
 		locked = false,
-		oncomplete
+		start = 0,
+		oncomplete,
+		onprogress
 	}: {
 		blocks: TextBlock[];
 		settings: ReadingSettings;
 		/** Calibration: the speed stays as set and the text reads once, without rewinds. */
 		locked?: boolean;
+		/** Word index to begin at, e.g. the saved position of a library document. */
+		start?: number;
 		oncomplete?: () => void;
+		/** Called whenever the position changes or reading time passes. */
+		onprogress?: (update: ReadingUpdate) => void;
 	} = $props();
 
 	const units = $derived(buildPresentation(blocks, settings.chunkSize));
-	let reader = $state.raw<ReaderState>({ index: 0, phase: { kind: 'ready' } });
+	let reader = $state.raw<ReaderState>({
+		index: untrack(() => unitIndexForWord(units, start)),
+		phase: { kind: 'ready' }
+	});
 	// Transient timing state: it changes every word and nothing renders it.
 	let timing: SmartTimingState | null = null;
 
@@ -52,8 +63,18 @@
 	function command(next: ReaderCommand) {
 		const transition = transitionReader(reader, next, units, settings, timing);
 		const finished = !completed && transition.state.phase.kind === 'completed';
+		const moved = transition.state.index !== reader.index;
 		reader = transition.state;
 		timing = transition.timing;
+		const presented =
+			transition.presentedIndex === null ? [] : units[transition.presentedIndex].words;
+		if (moved || finished || presented.length || transition.activeMilliseconds)
+			onprogress?.({
+				wordIndex: completed ? totalWords : (units[reader.index]?.wordIndex ?? 0),
+				completed,
+				activeMs: transition.activeMilliseconds,
+				words: presented.length
+			});
 		if (finished) oncomplete?.();
 	}
 

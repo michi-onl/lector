@@ -107,7 +107,7 @@ export const document = sqliteTable(
 		sourceKey: text('source_key'),
 		/** R2 key of the extracted document model (JSON). */
 		modelKey: text('model_key').notNull(),
-		/** Positions index into the model's presentation units, which depend on this version. */
+		/** Positions are word indices into the model, whose tokenization depends on this version. */
 		analyzerVersion: text('analyzer_version').notNull(),
 		wordCount: integer('word_count').notNull(),
 		unitCount: integer('unit_count').notNull(),

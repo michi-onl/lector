@@ -12,5 +12,6 @@
 	<div class="flex flex-wrap justify-center gap-3">
 		<Button href="/lesen">Text lesen</Button>
 		<Button href="/kalibrierung" variant="secondary">Tempo kalibrieren</Button>
+		<Button href="/bibliothek" variant="ghost">Bibliothek</Button>
 	</div>
 </main>
