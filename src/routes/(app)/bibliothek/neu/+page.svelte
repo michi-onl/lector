@@ -4,7 +4,6 @@
 	import { Button } from '#lib/components/ui/button/index.js';
 	import { Label } from '#lib/components/ui/label/index.js';
 	import { addText } from '#lib/library/index.js';
-	import Books from 'phosphor-svelte/lib/Books';
 	import Play from 'phosphor-svelte/lib/Play';
 	import { onMount } from 'svelte';
 
@@ -43,40 +42,35 @@
 </script>
 
 <svelte:head>
-	<title>Lesen · Lector</title>
+	<title>Neuer Text · Lector</title>
 </svelte:head>
 
-<main class="mx-auto flex min-h-svh max-w-3xl flex-col gap-8 p-6">
-	<header class="flex items-center justify-between gap-4">
-		<a href="/" class="font-heading text-2xl font-bold">Lect<span class="text-primary">o</span>r</a>
-		<Button variant="ghost" href="/bibliothek"><Books />Bibliothek</Button>
-	</header>
+<h1 class="font-heading text-3xl font-bold">Neuer Text</h1>
 
-	<form class="flex flex-col gap-4" onsubmit={read}>
-		<Label for="text">Text einfügen</Label>
-		<textarea
-			id="text"
-			bind:value={text}
-			rows="12"
-			class="w-full min-w-0 rounded-3xl border border-input bg-input/30 px-4 py-3 text-base transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
-			placeholder="Artikel, Skript oder Kapitel hier einfügen …"></textarea>
-		<div class="flex flex-wrap items-center gap-x-4 gap-y-2">
-			<Button type="submit" disabled={empty || saving}><Play />Lesen</Button>
-			<p class="text-sm text-muted-foreground">
-				{#if profile}
-					Kalibriert auf {profile.targetWpm} WPM ·
-					<a href="/kalibrierung" class="underline underline-offset-4">neu kalibrieren</a>
-				{:else}
-					<a href="/kalibrierung" class="underline underline-offset-4">Tempo kalibrieren</a>
-					und mit dem Tempo lesen, das dein Verständnis trägt
-				{/if}
-			</p>
-		</div>
-		{#if failed}
-			<p class="text-sm text-destructive">
-				Der Text ließ sich nicht in der Bibliothek speichern. Erlaubt der Browser das Speichern von
-				Daten für diese Seite?
-			</p>
-		{/if}
-	</form>
-</main>
+<form class="flex flex-col gap-4" onsubmit={read}>
+	<Label for="text">Text einfügen</Label>
+	<textarea
+		id="text"
+		bind:value={text}
+		rows="12"
+		class="w-full min-w-0 rounded-3xl border border-input bg-input/30 px-4 py-3 text-base transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
+		placeholder="Artikel, Skript oder Kapitel hier einfügen …"></textarea>
+	<div class="flex flex-wrap items-center gap-x-4 gap-y-2">
+		<Button type="submit" disabled={empty || saving}><Play />Lesen</Button>
+		<p class="text-sm text-muted-foreground">
+			{#if profile}
+				Kalibriert auf {profile.targetWpm} WPM ·
+				<a href="/kalibrierung" class="underline underline-offset-4">neu kalibrieren</a>
+			{:else}
+				<a href="/kalibrierung" class="underline underline-offset-4">Tempo kalibrieren</a>
+				und mit dem Tempo lesen, das dein Verständnis trägt
+			{/if}
+		</p>
+	</div>
+	{#if failed}
+		<p class="text-sm text-destructive">
+			Der Text ließ sich nicht in der Bibliothek speichern. Erlaubt der Browser das Speichern von
+			Daten für diese Seite?
+		</p>
+	{/if}
+</form>
