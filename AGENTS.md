@@ -23,6 +23,11 @@ SvelteKit 3 (Svelte 5 runes, TypeScript) on Cloudflare Workers, Tailwind 4, shad
 - The D1 schema lives in `src/lib/server/db/schema.ts` (Drizzle). After changing it, run `npx drizzle-kit generate --name <change>` and commit the new file in `migrations/`; apply it with `npx wrangler d1 migrations apply lector --local` (`--remote` only after asking). Never edit a migration that has been applied remotely.
 - The tables `user`, `session`, `account` and `verification` belong to Better Auth: keep their export and property names. Better Auth only allows Kit 2 as a peer, so `overrides` in `package.json` pins it to our Kit; drop the override once Better Auth supports Kit 3.
 - `npm run gen` ignores `.env` (it holds only the Planka key) and clears `.svelte-kit/cloudflare`, so the types match the Cloudflare build. Put local Worker secrets in `.dev.vars`.
+- `docs/prototyp.md` documents pages, architecture, data model, API and the live demo. Update it when any of these change.
+- Tariff rules live only in `src/lib/plan.ts`. Free keeps library, settings and profile in the browser; Pro keeps them in the account. Pages go through `libraryFor(plan)`, `loadPreferences(plan)` and `loadProfileFor(plan)` instead of choosing a store themselves.
+- The server validates everything browsers send with the shared parsers (`parseBlocks`, `parseReadingUpdate`, `parsePreferences`, `parseProfile`, `parseRuns`); reuse them for new endpoints.
+- Text extraction runs in the browser (pdf.js legacy build, mammoth); only URL import runs on the Worker. Keep heavy parsing off the Worker.
+- The live demo polls `/api/live/[code]` every 1.5 s; there are no WebSockets or Durable Objects.
 
 ## Language
 
