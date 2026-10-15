@@ -6,6 +6,14 @@ import type { TextBlock } from '#lib/reader/index.js';
  */
 export type DocumentFormat = 'pdf' | 'docx' | 'txt' | 'url' | 'text';
 
+export const FORMAT_LABELS: Record<DocumentFormat, string> = {
+	pdf: 'PDF',
+	docx: 'Word',
+	txt: 'Textdatei',
+	url: 'Webartikel',
+	text: 'Eingefügter Text'
+};
+
 export interface LibraryEntry {
 	id: string;
 	title: string;
@@ -13,8 +21,22 @@ export interface LibraryEntry {
 	/** SHA-256 of the text; the same text is stored only once. */
 	sha256: string;
 	wordCount: number;
+	/** Original file name; absent for URL imports and pasted text. */
+	fileName?: string | null;
+	sourceUrl?: string | null;
 	createdAt: string;
 	lastOpenedAt: string | null;
+}
+
+/** A text on its way into the library: pasted, or extracted from a file or web page. */
+export interface NewDocument {
+	blocks: TextBlock[];
+	format: DocumentFormat;
+	title?: string;
+	fileName?: string;
+	sourceUrl?: string;
+	/** The original file; only an account's library keeps it. */
+	source?: Blob;
 }
 
 /** Positions are word indices: they stay valid when the chunk size changes. */

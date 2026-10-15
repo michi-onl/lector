@@ -1,4 +1,4 @@
-import { textBlocks, type TextBlock } from '#lib/reader/index.js';
+import type { TextBlock } from '#lib/reader/index.js';
 import {
 	canonicalText,
 	deriveTitle,
@@ -6,9 +6,9 @@ import {
 	sha256,
 	sortEntries,
 	wordCount,
-	type DocumentFormat,
 	type LibraryEntry,
-	type LibraryProgress
+	type LibraryProgress,
+	type NewDocument
 } from './library.js';
 
 /**
@@ -77,12 +77,17 @@ export async function listLibrary(): Promise<
 	return sortEntries(entries).map((entry) => ({ entry, progress: byDocument.get(entry.id) }));
 }
 
-/** Stores pasted or imported text; a text already in the library returns its entry. */
-export async function addText(
-	text: string,
-	{ title, format = 'text' }: { title?: string; format?: DocumentFormat } = {}
-): Promise<LibraryEntry> {
-	const blocks = textBlocks(text);
+/**
+ * Stores pasted or imported text; a text already in the library returns its entry. The
+ * original file stays out: the browser library keeps only the text.
+ */
+export async function addDocument({
+	blocks,
+	format,
+	title,
+	fileName,
+	sourceUrl
+}: NewDocument): Promise<LibraryEntry> {
 	if (!blocks.length) throw new Error('Der Text ist leer.');
 	const hash = await sha256(canonicalText(blocks));
 	const db = await database();
@@ -97,6 +102,8 @@ export async function addText(
 		format,
 		sha256: hash,
 		wordCount: wordCount(blocks),
+		fileName: fileName ?? null,
+		sourceUrl: sourceUrl ?? null,
 		createdAt: now.toISOString(),
 		lastOpenedAt: null
 	};

@@ -1,6 +1,5 @@
 <script lang="ts">
-	import { Button } from '#lib/components/ui/button/index.js';
-	import Books from 'phosphor-svelte/lib/Books';
+	import SiteHeader from '#lib/components/site-header.svelte';
 	import type { PageProps } from './$types';
 	import DocumentReader from './document-reader.svelte';
 
@@ -12,10 +11,7 @@
 </svelte:head>
 
 <main class="mx-auto flex min-h-svh max-w-3xl flex-col gap-8 p-6">
-	<header class="flex items-center justify-between gap-4">
-		<a href="/" class="font-heading text-2xl font-bold">Lect<span class="text-primary">o</span>r</a>
-		<Button variant="ghost" href="/bibliothek"><Books />Bibliothek</Button>
-	</header>
+	<SiteHeader />
 
 	<h1 class="font-heading text-xl font-semibold">{data.entry.title}</h1>
 
