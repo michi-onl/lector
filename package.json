@@ -64,6 +64,7 @@
 		"drizzle-orm": "^0.45.4",
 		"linkedom": "^0.18.13",
 		"mammoth": "^1.13.0",
-		"pdfjs-dist": "^6.4.299"
+		"pdfjs-dist": "^6.4.299",
+		"uqr": "^0.1.3"
 	}
 }

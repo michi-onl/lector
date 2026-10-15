@@ -1,5 +1,13 @@
 import { sql } from 'drizzle-orm';
-import { check, index, integer, real, sqliteTable, text } from 'drizzle-orm/sqlite-core';
+import {
+	check,
+	index,
+	integer,
+	primaryKey,
+	real,
+	sqliteTable,
+	text
+} from 'drizzle-orm/sqlite-core';
 
 const id = () =>
 	text('id')
@@ -234,4 +242,64 @@ export const readingProfile = sqliteTable(
 		createdAt: createdAt()
 	},
 	(table) => [index('reading_profile_user_created_idx').on(table.userId, table.createdAt)]
+);
+
+// Live demo: the audience answers the quiz on their phones while the presenter reads.
+
+/** One audience session; the phase moves forward only, driven by the presenter. */
+export const liveSession = sqliteTable(
+	'live_session',
+	{
+		id: id(),
+		/** What the audience scans or types; short and without look-alike characters. */
+		code: text('code').notNull().unique(),
+		hostId: text('host_id')
+			.notNull()
+			.references(() => user.id, { onDelete: 'cascade' }),
+		/** Calibration text and speed of every round, in order. */
+		rounds: text('rounds', { mode: 'json' }).$type<{ textId: string; wpm: number }[]>().notNull(),
+		round: integer('round').notNull().default(0),
+		phase: text('phase', { enum: ['lobby', 'reading', 'questions', 'results', 'finished'] })
+			.notNull()
+			.default('lobby'),
+		createdAt: createdAt(),
+		updatedAt: updatedAt()
+	},
+	(table) => [index('live_session_host_idx').on(table.hostId)]
+);
+
+/** A phone in the audience, known only by a random id it keeps in its browser. */
+export const liveParticipant = sqliteTable(
+	'live_participant',
+	{
+		sessionId: text('session_id')
+			.notNull()
+			.references(() => liveSession.id, { onDelete: 'cascade' }),
+		participantId: text('participant_id').notNull(),
+		joinedAt: timestamp('joined_at')
+			.notNull()
+			.$defaultFn(() => new Date())
+	},
+	(table) => [primaryKey({ columns: [table.sessionId, table.participantId] })]
+);
+
+/** One answer per participant and question; a skip („Weiß ich nicht“) has no choice. */
+export const liveAnswer = sqliteTable(
+	'live_answer',
+	{
+		sessionId: text('session_id')
+			.notNull()
+			.references(() => liveSession.id, { onDelete: 'cascade' }),
+		participantId: text('participant_id').notNull(),
+		round: integer('round').notNull(),
+		question: integer('question').notNull(),
+		choice: integer('choice'),
+		correct: integer('correct', { mode: 'boolean' }).notNull(),
+		createdAt: createdAt()
+	},
+	(table) => [
+		primaryKey({
+			columns: [table.sessionId, table.participantId, table.round, table.question]
+		})
+	]
 );
