@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { page } from '$app/state';
 	import Reader from '#lib/components/reader/reader.svelte';
 	import SiteHeader from '#lib/components/site-header.svelte';
 	import { Button } from '#lib/components/ui/button/index.js';
@@ -8,11 +9,9 @@
 		CALIBRATION_LADDER,
 		CALIBRATION_TEXTS,
 		evaluateCalibration,
-		loadProfile,
 		nextWpm,
 		passed,
 		PRACTICE_TEXT,
-		saveProfile,
 		scoreRun,
 		shuffled,
 		type CalibrationResult,
@@ -20,7 +19,9 @@
 		type StoredProfile
 	} from '#lib/calibration/index.js';
 	import { DEFAULT_PREFERENCES, type Preferences } from '#lib/preferences/preferences.js';
-	import { loadLocalPreferences, saveLocalPreferences } from '#lib/preferences/store.js';
+	import { loadProfileFor, storeCalibration } from '#lib/calibration/store.js';
+	import { maximumWpm, planOf, syncs } from '#lib/plan.js';
+	import { loadPreferences, savePreferences } from '#lib/preferences/store.js';
 	import { textBlocks } from '#lib/reader/index.js';
 	import ArrowCounterClockwise from 'phosphor-svelte/lib/ArrowCounterClockwise';
 	import ArrowRight from 'phosphor-svelte/lib/ArrowRight';
@@ -44,6 +45,12 @@
 	let previous = $state.raw<StoredProfile | null>(null);
 	/** The reader's look; speed and chunking are fixed so every calibration is comparable. */
 	let appearance = $state.raw<Preferences>(DEFAULT_PREFERENCES);
+	let startedAt = new Date();
+	let saving = $state(false);
+	let failed = $state(false);
+
+	const plan = $derived(planOf(page.data.user));
+	const limit = $derived(maximumWpm(plan));
 
 	function settingsAt(targetWpm: number): Preferences {
 		return { ...appearance, speedMode: 'adaptive', chunkSize: 1, targetWpm };
@@ -56,8 +63,8 @@
 	);
 
 	onMount(() => {
-		previous = loadProfile(localStorage);
-		appearance = loadLocalPreferences(localStorage);
+		void loadProfileFor(plan).then((profile) => (previous = profile));
+		void loadPreferences(plan).then((preferences) => (appearance = preferences));
 	});
 
 	function start(practice: boolean) {
@@ -65,12 +72,34 @@
 		runs = [];
 		result = undefined;
 		saved = null;
+		failed = false;
+		startedAt = new Date();
 		step = practice ? 'practice' : 'reading';
 	}
 
 	function askQuestions() {
 		answers = text.questions.map(() => '');
 		step = 'questions';
+	}
+
+	async function finish(finished: CalibrationResult) {
+		result = finished;
+		step = 'result';
+		saving = true;
+		try {
+			saved = await storeCalibration(plan, finished, startedAt);
+			if (saved) {
+				previous = saved;
+				// The texts start at the new limit from now on.
+				const preferences = await loadPreferences(plan);
+				await savePreferences(plan, { ...preferences, targetWpm: saved.targetWpm });
+			}
+		} catch (error) {
+			console.error(error);
+			failed = true;
+		} finally {
+			saving = false;
+		}
 	}
 
 	function submit(event: SubmitEvent) {
@@ -82,17 +111,7 @@
 			step = 'reading';
 			return;
 		}
-		result = evaluateCalibration(runs);
-		saved = saveProfile(localStorage, result);
-		if (saved) {
-			previous = saved;
-			// The texts start at the new limit from now on.
-			saveLocalPreferences(localStorage, {
-				...loadLocalPreferences(localStorage),
-				targetWpm: saved.targetWpm
-			});
-		}
-		step = 'result';
+		void finish(evaluateCalibration(runs));
 	}
 
 	const percent = (value: number) => `${Math.round(value * 100)} %`;
@@ -196,8 +215,15 @@
 					<p class="text-muted-foreground">Deine Verständnisgrenze</p>
 					<p class="font-heading text-5xl font-bold">{result.targetWpm} WPM</p>
 					<p class="text-muted-foreground">
-						{percent(result.comprehension)} der Fragen bis zu diesem Tempo richtig beantwortet. Lector
-						startet deine Texte ab jetzt mit {result.targetWpm} WPM; du kannst das Tempo jederzeit ändern.
+						{percent(result.comprehension)} der Fragen bis zu diesem Tempo richtig beantwortet.
+						{#if result.targetWpm > limit}
+							Lector Free liest bis {limit} WPM; mit
+							<a href="/preise" class="underline underline-offset-4">Lector Pro</a> nutzt du dein volles
+							Tempo.
+						{:else}
+							Lector startet deine Texte ab jetzt mit {result.targetWpm} WPM; du kannst das Tempo jederzeit
+							ändern.
+						{/if}
 					</p>
 				</div>
 			{:else}
@@ -228,9 +254,20 @@
 				{/each}
 			</ol>
 
+			<p class="text-sm text-muted-foreground" aria-live="polite">
+				{#if saving}
+					Wird gespeichert …
+				{:else if failed}
+					<span class="text-destructive">Das Ergebnis ließ sich nicht speichern.</span>
+				{:else if saved && syncs(plan)}
+					Gespeichert in deinem Konto, mit allen Antworten für die
+					<a href="/konto#auswertung" class="underline underline-offset-4">Auswertung</a>.
+				{/if}
+			</p>
+
 			<div class="flex flex-wrap gap-3">
 				{#if saved}
-					<Button href="/lesen"><Play />Mit {saved.targetWpm} WPM lesen</Button>
+					<Button href="/lesen"><Play />Mit {Math.min(saved.targetWpm, limit)} WPM lesen</Button>
 				{/if}
 				<Button variant={saved ? 'ghost' : 'default'} onclick={() => start(false)}>
 					<ArrowCounterClockwise />Neu kalibrieren

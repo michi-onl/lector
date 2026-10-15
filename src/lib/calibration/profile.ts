@@ -32,22 +32,26 @@ export function saveProfile(
 }
 
 /** Anything unreadable counts as no profile. */
-export function loadProfile(storage: ProfileStorage): StoredProfile | null {
+export function loadProfile(storage: Pick<ProfileStorage, 'getItem'>): StoredProfile | null {
 	try {
-		const value: unknown = JSON.parse(storage.getItem(PROFILE_KEY) ?? 'null');
-		if (typeof value !== 'object' || value === null) return null;
-		const { targetWpm, comprehension, calibratedAt } = value as Record<string, unknown>;
-		if (
-			typeof targetWpm !== 'number' ||
-			clampWpm(targetWpm) !== targetWpm ||
-			typeof comprehension !== 'number' ||
-			!(comprehension >= 0 && comprehension <= 1) ||
-			typeof calibratedAt !== 'string' ||
-			Number.isNaN(Date.parse(calibratedAt))
-		)
-			return null;
-		return { targetWpm, comprehension, calibratedAt };
+		return parseProfile(JSON.parse(storage.getItem(PROFILE_KEY) ?? 'null'));
 	} catch {
 		return null;
 	}
+}
+
+/** Checks a stored or transmitted profile. */
+export function parseProfile(value: unknown): StoredProfile | null {
+	if (typeof value !== 'object' || value === null) return null;
+	const { targetWpm, comprehension, calibratedAt } = value as Record<string, unknown>;
+	if (
+		typeof targetWpm !== 'number' ||
+		clampWpm(targetWpm) !== targetWpm ||
+		typeof comprehension !== 'number' ||
+		!(comprehension >= 0 && comprehension <= 1) ||
+		typeof calibratedAt !== 'string' ||
+		Number.isNaN(Date.parse(calibratedAt))
+	)
+		return null;
+	return { targetWpm, comprehension, calibratedAt };
 }

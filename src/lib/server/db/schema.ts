@@ -26,7 +26,11 @@ export const user = sqliteTable('user', {
 	emailVerified: integer('email_verified', { mode: 'boolean' }).notNull().default(false),
 	image: text('image'),
 	createdAt: createdAt(),
-	updatedAt: updatedAt()
+	updatedAt: updatedAt(),
+	/** Lector's tariff, an additional field of Better Auth (see `auth.ts`). */
+	plan: text('plan', { enum: ['free', 'pro'] })
+		.notNull()
+		.default('free')
 });
 
 export const session = sqliteTable(

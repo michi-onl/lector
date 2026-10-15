@@ -3,12 +3,14 @@ import {
 	canonicalText,
 	deriveTitle,
 	emptyProgress,
+	recordReading,
 	sha256,
 	sortEntries,
 	wordCount,
 	type LibraryEntry,
 	type LibraryProgress,
-	type NewDocument
+	type NewDocument,
+	type ReadingUpdate
 } from './library.js';
 
 /**
@@ -21,6 +23,11 @@ const VERSION = 1;
 interface Content {
 	id: string;
 	blocks: TextBlock[];
+}
+
+export interface LibraryItem {
+	entry: LibraryEntry;
+	progress: LibraryProgress | undefined;
 }
 
 export interface OpenedDocument {
@@ -64,9 +71,7 @@ function committed(transaction: IDBTransaction): Promise<void> {
 	});
 }
 
-export async function listLibrary(): Promise<
-	{ entry: LibraryEntry; progress: LibraryProgress | undefined }[]
-> {
+export async function listLibrary(): Promise<LibraryItem[]> {
 	const db = await database();
 	const transaction = db.transaction(['documents', 'progress'], 'readonly');
 	const [entries, progress] = await Promise.all([
@@ -115,8 +120,8 @@ export async function addDocument({
 	return entry;
 }
 
-/** Loads a document for reading and marks it as opened. */
-export async function openDocument(id: string): Promise<OpenedDocument | null> {
+/** Loads a document for reading and marks it as opened, unless `mark` is false. */
+export async function openDocument(id: string, mark = true): Promise<OpenedDocument | null> {
 	const db = await database();
 	const transaction = db.transaction(['documents', 'contents', 'progress'], 'readwrite');
 	const [entry, content, progress] = await Promise.all([
@@ -125,16 +130,23 @@ export async function openDocument(id: string): Promise<OpenedDocument | null> {
 		done<LibraryProgress | undefined>(transaction.objectStore('progress').get(id))
 	]);
 	if (!entry || !content) return null;
-	const opened = { ...entry, lastOpenedAt: new Date().toISOString() };
+	const opened = mark ? { ...entry, lastOpenedAt: new Date().toISOString() } : entry;
 	transaction.objectStore('documents').put(opened);
 	await committed(transaction);
 	return { entry: opened, blocks: content.blocks, progress: progress ?? emptyProgress(id) };
 }
 
-export async function saveProgress(progress: LibraryProgress): Promise<void> {
+/** Adds what was read; reading and writing in one transaction, so no save is lost. */
+export async function recordProgress(
+	documentId: string,
+	update: ReadingUpdate,
+	total: number
+): Promise<void> {
 	const db = await database();
 	const transaction = db.transaction('progress', 'readwrite');
-	transaction.objectStore('progress').put(progress);
+	const store = transaction.objectStore('progress');
+	const saved = await done<LibraryProgress | undefined>(store.get(documentId));
+	store.put(recordReading(saved ?? emptyProgress(documentId), update, total));
 	await committed(transaction);
 }
 

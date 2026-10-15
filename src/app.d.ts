@@ -9,7 +9,10 @@ declare global {
 			user: import('#lib/server/auth.js').AuthSession['user'] | null;
 			session: import('#lib/server/auth.js').AuthSession['session'] | null;
 		}
-		// interface PageData {}
+		interface PageData {
+			/** From the root layout, on every page. */
+			user: import('#lib/plan.js').SessionUser | null;
+		}
 		// interface PageState {}
 	}
 }

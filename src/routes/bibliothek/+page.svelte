@@ -5,11 +5,12 @@
 	import { Progress } from '#lib/components/ui/progress/index.js';
 	import {
 		FORMAT_LABELS,
+		libraryFor,
 		progressShare,
-		removeDocument,
 		type LibraryEntry
 	} from '#lib/library/index.js';
-	import { loadLocalPreferences } from '#lib/preferences/store.js';
+	import { syncs } from '#lib/plan.js';
+	import DownloadSimple from 'phosphor-svelte/lib/DownloadSimple';
 	import Plus from 'phosphor-svelte/lib/Plus';
 	import Trash from 'phosphor-svelte/lib/Trash';
 	import type { PageProps } from './$types';
@@ -19,7 +20,8 @@
 	let items = $derived(data.items);
 	/** The entry whose delete button asks for confirmation. */
 	let confirming = $state<string | null>(null);
-	const wpm = loadLocalPreferences(localStorage).targetWpm;
+	const wpm = $derived(data.wpm);
+	const synced = $derived(syncs(data.plan));
 	const numbers = new Intl.NumberFormat('de-DE');
 	const dates = new Intl.DateTimeFormat('de-DE', { day: 'numeric', month: 'long' });
 
@@ -29,7 +31,7 @@
 	}
 
 	async function remove(entry: LibraryEntry) {
-		await removeDocument(entry.id);
+		await libraryFor(data.plan).remove(entry.id);
 		items = items.filter((item) => item.entry.id !== entry.id);
 		confirming = null;
 	}
@@ -46,7 +48,13 @@
 		<div class="flex flex-col gap-1">
 			<h1 class="font-heading text-3xl font-bold">Bibliothek</h1>
 			<p class="text-sm text-muted-foreground">
-				Ohne Account liegt die Bibliothek nur in diesem Browser.
+				{#if synced}
+					Deine Bibliothek liegt in deinem Konto, mit Fortschritt auf allen Geräten.
+				{:else}
+					Die Bibliothek liegt nur in diesem Browser. Mit
+					<a href="/preise" class="underline underline-offset-4">Lector Pro</a> ist sie auf allen Geräten
+					dabei.
+				{/if}
 			</p>
 		</div>
 		<Button href="/lesen"><Plus />Neuer Text</Button>
@@ -103,6 +111,17 @@
 						</Card.Header>
 						<Card.Content class="flex items-center gap-4">
 							<Progress value={share * 100} class="flex-1" />
+							{#if entry.hasSource}
+								<Button
+									variant="ghost"
+									size="icon"
+									href="/api/documents/{entry.id}/source"
+									aria-label="Original von „{entry.title}“ herunterladen"
+									data-sveltekit-reload
+								>
+									<DownloadSimple />
+								</Button>
+							{/if}
 							<Button variant="secondary" size="sm" href="/lesen/{entry.id}">
 								{share === 1 ? 'Noch einmal' : share > 0 ? 'Weiterlesen' : 'Lesen'}
 							</Button>

@@ -1,4 +1,4 @@
-import type { TextBlock } from '#lib/reader/index.js';
+import type { StructureBoundary, TextBlock } from '#lib/reader/index.js';
 
 /**
  * The library of the free tier lives in the browser. Entries and progress mirror the D1
@@ -24,6 +24,8 @@ export interface LibraryEntry {
 	/** Original file name; absent for URL imports and pasted text. */
 	fileName?: string | null;
 	sourceUrl?: string | null;
+	/** Whether the account keeps the original file for download. */
+	hasSource?: boolean;
 	createdAt: string;
 	lastOpenedAt: string | null;
 }
@@ -141,4 +143,64 @@ export function progressShare(progress: LibraryProgress | undefined, total: numb
 export function sortEntries(entries: LibraryEntry[]): LibraryEntry[] {
 	const time = (entry: LibraryEntry) => Date.parse(entry.lastOpenedAt ?? entry.createdAt);
 	return entries.toSorted((a, b) => time(b) - time(a));
+}
+
+/** What an account may store per text: about a thousand pages. */
+export const MAX_TEXT_CHARACTERS = 5_000_000;
+
+const FORMATS: readonly DocumentFormat[] = ['pdf', 'docx', 'txt', 'url', 'text'];
+const BOUNDARIES: readonly StructureBoundary[] = [
+	'none',
+	'sentence',
+	'paragraph',
+	'section',
+	'chapter'
+];
+
+export function parseFormat(value: unknown): DocumentFormat | null {
+	return FORMATS.includes(value as DocumentFormat) ? (value as DocumentFormat) : null;
+}
+
+/** Checks text blocks sent by a browser; null if anything is off or the text is too long. */
+export function parseBlocks(value: unknown): TextBlock[] | null {
+	if (!Array.isArray(value) || !value.length) return null;
+	const blocks: TextBlock[] = [];
+	let characters = 0;
+	for (const item of value) {
+		if (typeof item !== 'object' || item === null) return null;
+		const { id, text, sectionId, chapterId, boundaryAfter } = item as Record<string, unknown>;
+		if (
+			typeof id !== 'string' ||
+			typeof text !== 'string' ||
+			typeof sectionId !== 'string' ||
+			typeof chapterId !== 'string' ||
+			!BOUNDARIES.includes(boundaryAfter as StructureBoundary)
+		)
+			return null;
+		characters += text.length;
+		if (characters > MAX_TEXT_CHARACTERS) return null;
+		blocks.push({
+			id,
+			text,
+			sectionId,
+			chapterId,
+			boundaryAfter: boundaryAfter as StructureBoundary
+		});
+	}
+	return blocks;
+}
+
+export function parseReadingUpdate(value: unknown): ReadingUpdate | null {
+	if (typeof value !== 'object' || value === null) return null;
+	const { wordIndex, completed, activeMs, words } = value as Record<string, unknown>;
+	const count = (number: unknown) =>
+		typeof number === 'number' && Number.isFinite(number) && number >= 0;
+	if (!count(wordIndex) || !count(activeMs) || !count(words) || typeof completed !== 'boolean')
+		return null;
+	return {
+		wordIndex: Math.trunc(wordIndex as number),
+		completed,
+		activeMs: Math.round(activeMs as number),
+		words: Math.trunc(words as number)
+	};
 }
