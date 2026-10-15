@@ -18,7 +18,9 @@
 		type CalibrationRun,
 		type StoredProfile
 	} from '#lib/calibration/index.js';
-	import { DEFAULT_READING_SETTINGS, textBlocks } from '#lib/reader/index.js';
+	import { DEFAULT_PREFERENCES, type Preferences } from '#lib/preferences/preferences.js';
+	import { loadLocalPreferences, saveLocalPreferences } from '#lib/preferences/store.js';
+	import { textBlocks } from '#lib/reader/index.js';
 	import ArrowCounterClockwise from 'phosphor-svelte/lib/ArrowCounterClockwise';
 	import ArrowRight from 'phosphor-svelte/lib/ArrowRight';
 	import Check from 'phosphor-svelte/lib/Check';
@@ -39,6 +41,12 @@
 	let result = $state.raw<CalibrationResult>();
 	let saved = $state.raw<StoredProfile | null>(null);
 	let previous = $state.raw<StoredProfile | null>(null);
+	/** The reader's look; speed and chunking are fixed so every calibration is comparable. */
+	let appearance = $state.raw<Preferences>(DEFAULT_PREFERENCES);
+
+	function settingsAt(targetWpm: number): Preferences {
+		return { ...appearance, speedMode: 'adaptive', chunkSize: 1, targetWpm };
+	}
 
 	const wpm = $derived(nextWpm(runs));
 	const text = $derived(texts[runs.length]);
@@ -48,6 +56,7 @@
 
 	onMount(() => {
 		previous = loadProfile(localStorage);
+		appearance = loadLocalPreferences(localStorage);
 	});
 
 	function start(practice: boolean) {
@@ -74,7 +83,14 @@
 		}
 		result = evaluateCalibration(runs);
 		saved = saveProfile(localStorage, result);
-		if (saved) previous = saved;
+		if (saved) {
+			previous = saved;
+			// The texts start at the new limit from now on.
+			saveLocalPreferences(localStorage, {
+				...loadLocalPreferences(localStorage),
+				targetWpm: saved.targetWpm
+			});
+		}
 		step = 'result';
 	}
 
@@ -122,7 +138,7 @@
 		<p class="text-muted-foreground">Probelauf mit {PRACTICE_WPM} WPM – wird nicht bewertet.</p>
 		<Reader
 			blocks={textBlocks(PRACTICE_TEXT)}
-			settings={{ ...DEFAULT_READING_SETTINGS, targetWpm: PRACTICE_WPM }}
+			settings={settingsAt(PRACTICE_WPM)}
 			locked
 			oncomplete={() => (step = 'practiced')}
 		/>
@@ -145,7 +161,7 @@
 		{#key runs.length}
 			<Reader
 				blocks={textBlocks(text.text)}
-				settings={{ ...DEFAULT_READING_SETTINGS, targetWpm: wpm }}
+				settings={settingsAt(wpm)}
 				locked
 				oncomplete={askQuestions}
 			/>

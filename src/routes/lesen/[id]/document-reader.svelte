@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { loadProfile } from '#lib/calibration/index.js';
 	import Reader from '#lib/components/reader/reader.svelte';
 	import {
 		mergeUpdates,
@@ -9,7 +8,7 @@
 		type OpenedDocument,
 		type ReadingUpdate
 	} from '#lib/library/index.js';
-	import { DEFAULT_READING_SETTINGS } from '#lib/reader/index.js';
+	import { loadLocalPreferences, saveLocalPreferences } from '#lib/preferences/store.js';
 	import { onDestroy, untrack } from 'svelte';
 
 	/** Progress is saved this often while reading, and whenever the page is left. */
@@ -20,11 +19,10 @@
 	const { entry, blocks } = untrack(() => opened);
 	let progress = untrack(() => opened.progress);
 	const start = resumePosition(progress, entry.wordCount);
-	let settings = $state({
-		...DEFAULT_READING_SETTINGS,
-		targetWpm: loadProfile(localStorage)?.targetWpm ?? DEFAULT_READING_SETTINGS.targetWpm
-	});
+	let settings = $state(loadLocalPreferences(localStorage));
 	let pending: ReadingUpdate | null = null;
+
+	$effect(() => saveLocalPreferences(localStorage, $state.snapshot(settings)));
 
 	function save() {
 		if (!pending) return;

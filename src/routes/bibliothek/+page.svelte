@@ -1,10 +1,9 @@
 <script lang="ts">
-	import { loadProfile } from '#lib/calibration/index.js';
 	import { Button } from '#lib/components/ui/button/index.js';
 	import * as Card from '#lib/components/ui/card/index.js';
 	import { Progress } from '#lib/components/ui/progress/index.js';
 	import { progressShare, removeDocument, type LibraryEntry } from '#lib/library/index.js';
-	import { DEFAULT_READING_SETTINGS } from '#lib/reader/index.js';
+	import { loadLocalPreferences } from '#lib/preferences/store.js';
 	import Plus from 'phosphor-svelte/lib/Plus';
 	import Trash from 'phosphor-svelte/lib/Trash';
 	import type { PageProps } from './$types';
@@ -14,7 +13,7 @@
 	let items = $derived(data.items);
 	/** The entry whose delete button asks for confirmation. */
 	let confirming = $state<string | null>(null);
-	const wpm = loadProfile(localStorage)?.targetWpm ?? DEFAULT_READING_SETTINGS.targetWpm;
+	const wpm = loadLocalPreferences(localStorage).targetWpm;
 	const numbers = new Intl.NumberFormat('de-DE');
 	const dates = new Intl.DateTimeFormat('de-DE', { day: 'numeric', month: 'long' });
 
