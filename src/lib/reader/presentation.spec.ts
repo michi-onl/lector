@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+	blockWords,
 	boundaryDurationMs,
 	buildPresentation,
 	findJumpIndex,
@@ -173,6 +174,17 @@ describe('plain text', () => {
 			}
 		]);
 		expect(textBlocks(' \n\n ')).toEqual([]);
+	});
+
+	it('numbers the words of the full text like the reader does', () => {
+		const blocks = textBlocks('Der kleine Hund lief.\n\nDann kam die Sonne');
+		const words = blockWords(blocks).flatMap((block) => block.words);
+		expect(words.map((word) => word.text)).toEqual(
+			'Der kleine Hund lief. Dann kam die Sonne'.split(' ')
+		);
+		for (const chunkSize of [1, 2, 3] as ChunkSize[])
+			for (const unit of buildPresentation(blocks, chunkSize))
+				expect(words[unit.wordIndex].text).toBe(unit.words[0]);
 	});
 });
 

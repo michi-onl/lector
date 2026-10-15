@@ -125,6 +125,20 @@ export function boundaryDurationMs(unit: PresentationUnit): number {
 	return BOUNDARY_DURATION_MS[unit.boundaryAfter];
 }
 
+/** A block's words for the full text view, numbered like `PresentationUnit.wordIndex`. */
+export interface BlockWords {
+	block: TextBlock;
+	words: { text: string; wordIndex: number }[];
+}
+
+export function blockWords(blocks: TextBlock[]): BlockWords[] {
+	let wordIndex = 0;
+	return blocks.map((block) => ({
+		block,
+		words: Array.from(block.text.matchAll(/\S+/gu), ([text]) => ({ text, wordIndex: wordIndex++ }))
+	}));
+}
+
 /** The unit that shows a given word, e.g. after the chunk size changed. */
 export function unitIndexForWord(units: PresentationUnit[], wordIndex: number): number {
 	let found = 0;

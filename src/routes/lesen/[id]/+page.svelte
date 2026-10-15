@@ -26,7 +26,7 @@
 	{/key}
 	<p class="text-sm text-muted-foreground">
 		Tippen aufs Wort oder <kbd>←</kbd> springt zum Satzanfang, <kbd>Leertaste</kbd> startet und
-		pausiert.
+		pausiert. Im Volltext springt ein Klick aufs Wort dorthin.
 		{syncs(data.plan)
 			? 'Der Fortschritt wird in deinem Konto gespeichert.'
 			: 'Der Fortschritt wird in diesem Browser gespeichert.'}

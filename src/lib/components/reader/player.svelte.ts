@@ -97,6 +97,11 @@ export class Player {
 		this.command({ type: 'seek', index: 0 });
 	}
 
+	/** A word picked in the full text: the reader stops there, ready to read on. */
+	seekWord(wordIndex: number) {
+		this.command({ type: 'seek', index: unitIndexForWord(this.units, wordIndex) });
+	}
+
 	/** New chunk sizes regroup the text; the reader stays on the same word. */
 	setChunkSize(size: ChunkSize) {
 		const wordIndex = this.unit?.wordIndex ?? 0;

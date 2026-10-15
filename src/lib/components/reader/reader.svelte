@@ -17,10 +17,12 @@
 	} from '#lib/preferences/preferences.js';
 	import { MAXIMUM_WPM, MINIMUM_WPM, type ChunkSize, type TextBlock } from '#lib/reader/index.js';
 	import ArrowCounterClockwise from 'phosphor-svelte/lib/ArrowCounterClockwise';
+	import Article from 'phosphor-svelte/lib/Article';
 	import Pause from 'phosphor-svelte/lib/Pause';
 	import Play from 'phosphor-svelte/lib/Play';
 	import SkipBack from 'phosphor-svelte/lib/SkipBack';
 	import { untrack } from 'svelte';
+	import FullText from './full-text.svelte';
 	import { Player } from './player.svelte.js';
 	import Stage from './stage.svelte';
 
@@ -53,6 +55,7 @@
 		oncomplete: () => oncomplete?.(),
 		onprogress: (update) => onprogress?.(update)
 	});
+	let showText = $state(false);
 
 	const minutesLeft = $derived(
 		Math.ceil((player.totalWords - player.wordsRead) / settings.targetWpm)
@@ -111,6 +114,9 @@
 				disabled={player.state.index === 0 && !player.completed}
 			>
 				<ArrowCounterClockwise />Von vorn
+			</Button>
+			<Button variant="ghost" onclick={() => (showText = !showText)} aria-expanded={showText}>
+				<Article />{showText ? 'Volltext ausblenden' : 'Volltext'}
 			</Button>
 		{:else}
 			<span class="text-sm text-muted-foreground tabular-nums">{settings.targetWpm} WPM</span>
@@ -205,5 +211,15 @@
 				</div>
 			</div>
 		</section>
+	{/if}
+
+	{#if showText && !locked}
+		<FullText
+			{blocks}
+			current={player.completed || !player.unit
+				? null
+				: { wordIndex: player.unit.wordIndex, length: player.unit.words.length }}
+			onseek={(wordIndex) => player.seekWord(wordIndex)}
+		/>
 	{/if}
 </div>

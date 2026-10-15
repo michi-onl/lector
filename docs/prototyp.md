@@ -8,7 +8,7 @@ Stand: 15. Oktober 2026. Dieses Dokument beschreibt, was der Prototyp kann, wie 
 | ---------------------------- | ------------------------------------------------------------------------------------------------------ |
 | `/`                          | Startseite: Wertversprechen, Funktionen, Antworten auf die Forschungskritik                            |
 | `/lesen`                     | Neuer Text: einfügen, Datei hochladen (PDF, DOCX, TXT) oder Webartikel per URL importieren             |
-| `/lesen/[id]`                | Reader mit ORP, adaptivem Tempo, Satz-Rewind, Chunk-Modus und optischer Anpassung                      |
+| `/lesen/[id]`                | Reader mit ORP, adaptivem Tempo, Satz-Rewind, Chunk-Modus, optischer Anpassung und Volltext            |
 | `/bibliothek`                | Gespeicherte Texte mit Lesefortschritt und Restzeit, für Pro mit Download des Originals                |
 | `/kalibrierung`              | Quiz-Kalibrierung: bis zu sechs Texte von 200 bis 700 WPM, ermittelt die persönliche Verständnisgrenze |
 | `/preise`                    | Tarife Free, Pro, Business/Edu und Rechner für gesparte Lesestunden                                    |
