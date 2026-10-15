@@ -5,8 +5,12 @@
 	const links = [
 		{ href: '/lesen', label: 'Lesen' },
 		{ href: '/bibliothek', label: 'Bibliothek' },
-		{ href: '/kalibrierung', label: 'Kalibrierung' }
+		{ href: '/kalibrierung', label: 'Kalibrierung' },
+		{ href: '/preise', label: 'Preise' }
 	];
+
+	const user = $derived(page.data.user);
+	const accountPages = ['/konto', '/anmelden', '/registrieren'];
 </script>
 
 <header class="flex flex-wrap items-center justify-between gap-x-6 gap-y-3">
@@ -21,5 +25,18 @@
 				{link.label}
 			</a>
 		{/each}
+		<a
+			href={user ? '/konto' : '/anmelden'}
+			class="ml-1 rounded-full border px-3 py-1.5 transition-colors hover:bg-muted aria-[current=page]:bg-muted aria-[current=page]:font-medium"
+			aria-current={accountPages.includes(page.url.pathname) ? 'page' : undefined}
+		>
+			{#if user}
+				{user.name}{#if user.plan === 'pro'}<span class="ml-1.5 font-semibold text-primary"
+						>Pro</span
+					>{/if}
+			{:else}
+				Anmelden
+			{/if}
+		</a>
 	</nav>
 </header>

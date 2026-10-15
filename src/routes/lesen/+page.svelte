@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { loadProfile, type StoredProfile } from '#lib/calibration/index.js';
+	import { page } from '$app/state';
+	import type { StoredProfile } from '#lib/calibration/index.js';
+	import { loadProfileFor } from '#lib/calibration/store.js';
 	import SiteHeader from '#lib/components/site-header.svelte';
 	import * as Alert from '#lib/components/ui/alert/index.js';
 	import { Button } from '#lib/components/ui/button/index.js';
@@ -11,11 +13,13 @@
 	import {
 		ACCEPTED_FILES,
 		blocksFromParagraphs,
+		fileFormat,
 		ImportError,
 		importFile,
 		MAX_FILE_BYTES
 	} from '#lib/import/index.js';
-	import { addDocument, type NewDocument } from '#lib/library/index.js';
+	import { libraryFor, type NewDocument } from '#lib/library/index.js';
+	import { allowsFormat, planOf, syncs } from '#lib/plan.js';
 	import { textBlocks } from '#lib/reader/index.js';
 	import FileArrowUp from 'phosphor-svelte/lib/FileArrowUp';
 	import Globe from 'phosphor-svelte/lib/Globe';
@@ -36,9 +40,13 @@
 	let busy = $state<string | null>(null);
 	let failure = $state<string | null>(null);
 	let dragging = $state(false);
+	/** The failure is a Pro format; the message then links to the tariffs. */
+	let upgrade = $state(false);
+
+	const plan = $derived(planOf(page.data.user));
 
 	onMount(() => {
-		profile = loadProfile(localStorage);
+		void loadProfileFor(plan).then((loaded) => (profile = loaded));
 	});
 
 	const empty = $derived(!text.trim());
@@ -46,16 +54,21 @@
 	/** Every text goes into the library first, so its progress is kept. */
 	async function open(load: () => Promise<NewDocument>) {
 		failure = null;
+		upgrade = false;
 		busy = 'Wird geladen …';
 		try {
-			const entry = await addDocument(await load());
+			const document = await load();
+			if (syncs(plan)) busy = 'Wird in deinem Konto gespeichert …';
+			const entry = await libraryFor(plan).add(document);
 			await goto(`/lesen/${entry.id}`);
 		} catch (error) {
 			console.error(error);
 			failure =
 				error instanceof ImportError
 					? error.message
-					: 'Der Text ließ sich nicht in der Bibliothek speichern. Erlaubt der Browser das Speichern von Daten für diese Seite?';
+					: syncs(plan)
+						? 'Der Text ließ sich nicht in deinem Konto speichern. Bist du noch angemeldet?'
+						: 'Der Text ließ sich nicht in der Bibliothek speichern. Erlaubt der Browser das Speichern von Daten für diese Seite?';
 		} finally {
 			busy = null;
 		}
@@ -69,6 +82,11 @@
 	function readFile(file: File | undefined) {
 		if (!file) return;
 		void open(async () => {
+			const format = await fileFormat(file);
+			if (!allowsFormat(plan, format)) {
+				upgrade = true;
+				throw new ImportError('PDF- und Word-Dateien liest Lector Pro.');
+			}
 			busy = `„${file.name}“ wird gelesen …`;
 			return importFile(file, (page, pages) => {
 				busy = `Seite ${page} von ${pages} wird gelesen …`;
@@ -163,8 +181,13 @@
 				<FileArrowUp class="size-10 text-primary" />
 				<span class="font-medium">Datei auswählen oder hierher ziehen</span>
 				<span class="text-sm text-muted-foreground">
-					PDF, Word (DOCX) oder TXT, bis {MAX_FILE_BYTES / 1024 / 1024} MB. Der Text wird in deinem Browser
-					ausgelesen.
+					{#if plan === 'pro'}
+						PDF, Word (DOCX) oder TXT, bis {MAX_FILE_BYTES / 1024 / 1024} MB. Der Text wird in deinem
+						Browser ausgelesen, das Original in deinem Konto gespeichert.
+					{:else}
+						TXT, bis {MAX_FILE_BYTES / 1024 / 1024} MB. PDF und Word (DOCX) liest
+						<a href="/preise" class="underline underline-offset-4">Lector Pro</a>.
+					{/if}
 				</span>
 				<input
 					type="file"
@@ -202,9 +225,16 @@
 		{#if busy}
 			<p class="text-sm text-muted-foreground">{busy}</p>
 		{:else if failure}
-			<Alert.Root variant="destructive">
+			<Alert.Root variant={upgrade ? 'default' : 'destructive'}>
 				<WarningCircle />
-				<Alert.Description>{failure}</Alert.Description>
+				<Alert.Description>
+					{failure}
+					{#if upgrade}
+						<a href="/preise" class="underline underline-offset-4">
+							Text und Webartikel sind kostenlos; mehr zu Pro.
+						</a>
+					{/if}
+				</Alert.Description>
 			</Alert.Root>
 		{/if}
 	</div>

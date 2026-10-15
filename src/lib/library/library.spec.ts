@@ -4,7 +4,10 @@ import {
 	canonicalText,
 	deriveTitle,
 	emptyProgress,
+	MAX_TEXT_CHARACTERS,
 	mergeUpdates,
+	parseBlocks,
+	parseReadingUpdate,
 	progressShare,
 	recordReading,
 	resumePosition,
@@ -154,5 +157,33 @@ describe('sortEntries', () => {
 			entry('opened', '2026-09-01T00:00:00Z', '2026-10-13T00:00:00Z')
 		]);
 		expect(sorted.map((item) => item.id)).toEqual(['opened', 'new', 'old']);
+	});
+});
+
+describe('parseBlocks', () => {
+	it('accepts the blocks the browser builds', () => {
+		const blocks = textBlocks('Eins.\n\nZwei.');
+		expect(parseBlocks(JSON.parse(JSON.stringify(blocks)))).toEqual(blocks);
+	});
+
+	it('rejects malformed, empty and oversized texts', () => {
+		expect(parseBlocks([])).toBeNull();
+		expect(parseBlocks([{ id: 'p0', text: 'x' }])).toBeNull();
+		expect(parseBlocks([{ ...textBlocks('x')[0], boundaryAfter: 'page' }])).toBeNull();
+		expect(
+			parseBlocks([{ ...textBlocks('x')[0], text: 'x'.repeat(MAX_TEXT_CHARACTERS + 1) }])
+		).toBeNull();
+	});
+});
+
+describe('parseReadingUpdate', () => {
+	it('rounds times and rejects negative or missing values', () => {
+		expect(
+			parseReadingUpdate({ wordIndex: 4, completed: false, activeMs: 10.6, words: 2 })
+		).toEqual({ wordIndex: 4, completed: false, activeMs: 11, words: 2 });
+		expect(
+			parseReadingUpdate({ wordIndex: -1, completed: false, activeMs: 0, words: 0 })
+		).toBeNull();
+		expect(parseReadingUpdate({ wordIndex: 1, activeMs: 0, words: 0 })).toBeNull();
 	});
 });
