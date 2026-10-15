@@ -10,7 +10,6 @@
 	 * keys or a presenter's clicker (Page Down / Page Up) step through it; F toggles full screen.
 	 */
 	let segment = $state(-1);
-	let running = $state(false);
 	let done = $state(false);
 	let player = $state<StagePlayer>();
 	let width = $state(1280);
@@ -37,7 +36,7 @@
 
 	function back() {
 		if (segment < 0) return;
-		if (running || done) {
+		if (player?.isRunning() || done) {
 			done = false;
 			player?.restart();
 		} else if (segment > 0) segment--;
@@ -87,7 +86,6 @@
 		{#key segment}
 			<StagePlayer
 				bind:this={player}
-				bind:running
 				blocks={textBlocks(current.text)}
 				{settings}
 				autostart

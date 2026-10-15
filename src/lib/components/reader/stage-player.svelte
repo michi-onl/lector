@@ -14,7 +14,6 @@
 		blocks,
 		settings,
 		autostart = false,
-		running = $bindable(false),
 		completedText,
 		label = 'Lesen oder pausieren',
 		class: className,
@@ -24,7 +23,6 @@
 		blocks: TextBlock[];
 		settings: Preferences;
 		autostart?: boolean;
-		running?: boolean;
 		completedText?: string;
 		label?: string;
 		class?: string;
@@ -38,16 +36,16 @@
 		oncomplete: () => oncomplete?.()
 	});
 
-	$effect(() => {
-		running = player.running;
-	});
-
 	onMount(() => {
 		if (untrack(() => autostart)) player.toggle();
 	});
 
 	export function toggle() {
 		player.toggle();
+	}
+
+	export function isRunning() {
+		return player.running;
 	}
 
 	export function restart() {
