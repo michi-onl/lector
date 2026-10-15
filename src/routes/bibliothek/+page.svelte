@@ -1,8 +1,14 @@
 <script lang="ts">
+	import SiteHeader from '#lib/components/site-header.svelte';
 	import { Button } from '#lib/components/ui/button/index.js';
 	import * as Card from '#lib/components/ui/card/index.js';
 	import { Progress } from '#lib/components/ui/progress/index.js';
-	import { progressShare, removeDocument, type LibraryEntry } from '#lib/library/index.js';
+	import {
+		FORMAT_LABELS,
+		progressShare,
+		removeDocument,
+		type LibraryEntry
+	} from '#lib/library/index.js';
 	import { loadLocalPreferences } from '#lib/preferences/store.js';
 	import Plus from 'phosphor-svelte/lib/Plus';
 	import Trash from 'phosphor-svelte/lib/Trash';
@@ -17,6 +23,11 @@
 	const numbers = new Intl.NumberFormat('de-DE');
 	const dates = new Intl.DateTimeFormat('de-DE', { day: 'numeric', month: 'long' });
 
+	function source(entry: LibraryEntry) {
+		const format = FORMAT_LABELS[entry.format];
+		return entry.sourceUrl ? `${format} (${new URL(entry.sourceUrl).hostname})` : format;
+	}
+
 	async function remove(entry: LibraryEntry) {
 		await removeDocument(entry.id);
 		items = items.filter((item) => item.entry.id !== entry.id);
@@ -29,16 +40,16 @@
 </svelte:head>
 
 <main class="mx-auto flex min-h-svh max-w-3xl flex-col gap-8 p-6">
-	<header class="flex items-center justify-between gap-4">
-		<a href="/" class="font-heading text-2xl font-bold">Lect<span class="text-primary">o</span>r</a>
-		<Button href="/lesen"><Plus />Neuer Text</Button>
-	</header>
+	<SiteHeader />
 
-	<div class="flex flex-col gap-1">
-		<h1 class="font-heading text-3xl font-bold">Bibliothek</h1>
-		<p class="text-sm text-muted-foreground">
-			Ohne Account liegt die Bibliothek nur in diesem Browser.
-		</p>
+	<div class="flex flex-wrap items-end justify-between gap-4">
+		<div class="flex flex-col gap-1">
+			<h1 class="font-heading text-3xl font-bold">Bibliothek</h1>
+			<p class="text-sm text-muted-foreground">
+				Ohne Account liegt die Bibliothek nur in diesem Browser.
+			</p>
+		</div>
+		<Button href="/lesen"><Plus />Neuer Text</Button>
 	</div>
 
 	{#if items.length}
@@ -55,6 +66,7 @@
 								</a>
 							</Card.Title>
 							<Card.Description>
+								{source(entry)} ·
 								{numbers.format(entry.wordCount)} Wörter ·
 								{#if progress?.completedAt && share === 1}
 									fertig gelesen
@@ -104,11 +116,12 @@
 			<Card.Header>
 				<Card.Title>Noch nichts gespeichert</Card.Title>
 				<Card.Description>
-					Füge einen Text ein; Lector merkt sich, wo du aufgehört hast.
+					Füge einen Text ein, lade eine Datei hoch oder importiere einen Webartikel; Lector merkt
+					sich, wo du aufgehört hast.
 				</Card.Description>
 			</Card.Header>
 			<Card.Footer>
-				<Button href="/lesen"><Plus />Text einfügen</Button>
+				<Button href="/lesen"><Plus />Text hinzufügen</Button>
 			</Card.Footer>
 		</Card.Root>
 	{/if}

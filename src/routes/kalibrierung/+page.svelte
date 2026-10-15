@@ -1,5 +1,6 @@
 <script lang="ts">
 	import Reader from '#lib/components/reader/reader.svelte';
+	import SiteHeader from '#lib/components/site-header.svelte';
 	import { Button } from '#lib/components/ui/button/index.js';
 	import { Label } from '#lib/components/ui/label/index.js';
 	import * as RadioGroup from '#lib/components/ui/radio-group/index.js';
@@ -102,14 +103,12 @@
 </svelte:head>
 
 <main class="mx-auto flex min-h-svh max-w-3xl flex-col gap-8 p-6">
-	<header class="flex items-center justify-between gap-4">
-		<a href="/" class="font-heading text-2xl font-bold">Lect<span class="text-primary">o</span>r</a>
-		{#if step === 'reading' || step === 'questions'}
-			<span class="text-sm text-muted-foreground">
-				Text {runs.length + 1} von höchstens {CALIBRATION_LADDER.length}
-			</span>
-		{/if}
-	</header>
+	<SiteHeader />
+	{#if step === 'reading' || step === 'questions'}
+		<p class="-mb-4 text-sm text-muted-foreground">
+			Text {runs.length + 1} von höchstens {CALIBRATION_LADDER.length}
+		</p>
+	{/if}
 
 	{#if step === 'intro'}
 		<section class="flex flex-col gap-4">
