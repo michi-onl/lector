@@ -108,4 +108,10 @@
 		</p>
 		<Button href="/preise" variant="secondary">Preise ansehen</Button>
 	</section>
+
+	<footer class="flex flex-wrap gap-x-6 gap-y-2 text-sm text-muted-foreground">
+		<span>Für die Präsentation:</span>
+		<a href="/praesentation" class="underline underline-offset-4">Team-Intro per RSVP</a>
+		<a href="/live" class="underline underline-offset-4">Live-Demo mit Publikum</a>
+	</footer>
 </main>
