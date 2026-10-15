@@ -5,115 +5,62 @@
 	import * as RadioGroup from '#lib/components/ui/radio-group/index.js';
 	import { Slider } from '#lib/components/ui/slider/index.js';
 	import { Switch } from '#lib/components/ui/switch/index.js';
+	import * as ToggleGroup from '#lib/components/ui/toggle-group/index.js';
+	import type { ReadingUpdate } from '#lib/library/library.js';
 	import {
-		buildPresentation,
-		MAXIMUM_WPM,
-		MINIMUM_WPM,
-		transitionReader,
-		unitIndexForWord,
-		type ChunkSize,
-		type ReaderCommand,
-		type ReaderState,
-		type ReadingSettings,
-		type SmartTimingState,
-		type TextBlock
-	} from '#lib/reader/index.js';
+		BACKGROUNDS,
+		FONT_SIZE,
+		FONTS,
+		type Preferences,
+		type ReaderBackground,
+		type ReaderFont
+	} from '#lib/preferences/preferences.js';
+	import { MAXIMUM_WPM, MINIMUM_WPM, type ChunkSize, type TextBlock } from '#lib/reader/index.js';
 	import ArrowCounterClockwise from 'phosphor-svelte/lib/ArrowCounterClockwise';
 	import Pause from 'phosphor-svelte/lib/Pause';
 	import Play from 'phosphor-svelte/lib/Play';
 	import SkipBack from 'phosphor-svelte/lib/SkipBack';
-	import type { ReadingUpdate } from '#lib/library/index.js';
 	import { untrack } from 'svelte';
-	import AnchorWord from './anchor-word.svelte';
+	import { Player } from './player.svelte.js';
+	import Stage from './stage.svelte';
 
 	let {
 		blocks,
 		settings = $bindable(),
 		locked = false,
 		start = 0,
+		maximumWpm = MAXIMUM_WPM,
 		oncomplete,
 		onprogress
 	}: {
 		blocks: TextBlock[];
-		settings: ReadingSettings;
+		settings: Preferences;
 		/** Calibration: the speed stays as set and the text reads once, without rewinds. */
 		locked?: boolean;
 		/** Word index to begin at, e.g. the saved position of a library document. */
 		start?: number;
+		/** The tariff's limit for the speed slider. */
+		maximumWpm?: number;
 		oncomplete?: () => void;
 		/** Called whenever the position changes or reading time passes. */
 		onprogress?: (update: ReadingUpdate) => void;
 	} = $props();
 
-	const units = $derived(buildPresentation(blocks, settings.chunkSize));
-	let reader = $state.raw<ReaderState>({
-		index: untrack(() => unitIndexForWord(units, start)),
-		phase: { kind: 'ready' }
+	const player = new Player({
+		blocks: () => blocks,
+		settings: () => settings,
+		start: untrack(() => start),
+		oncomplete: () => oncomplete?.(),
+		onprogress: (update) => onprogress?.(update)
 	});
-	// Transient timing state: it changes every word and nothing renders it.
-	let timing: SmartTimingState | null = null;
 
-	const running = $derived(reader.phase.kind === 'playing' || reader.phase.kind === 'structure');
-	const completed = $derived(reader.phase.kind === 'completed');
-	const unit = $derived(units[reader.index]);
-	const totalWords = $derived(units.reduce((sum, item) => sum + item.words.length, 0));
-	const wordsRead = $derived(completed ? totalWords : (unit?.wordIndex ?? 0));
-	const minutesLeft = $derived(Math.ceil((totalWords - wordsRead) / settings.targetWpm));
+	const minutesLeft = $derived(
+		Math.ceil((player.totalWords - player.wordsRead) / settings.targetWpm)
+	);
 
-	function command(next: ReaderCommand) {
-		const transition = transitionReader(reader, next, units, settings, timing);
-		const finished = !completed && transition.state.phase.kind === 'completed';
-		const moved = transition.state.index !== reader.index;
-		reader = transition.state;
-		timing = transition.timing;
-		const presented =
-			transition.presentedIndex === null ? [] : units[transition.presentedIndex].words;
-		if (moved || finished || presented.length || transition.activeMilliseconds)
-			onprogress?.({
-				wordIndex: completed ? totalWords : (units[reader.index]?.wordIndex ?? 0),
-				completed,
-				activeMs: transition.activeMilliseconds,
-				words: presented.length
-			});
-		if (finished) oncomplete?.();
-	}
-
-	function toggle() {
-		if (running) return command({ type: 'pause' });
-		if (completed) command({ type: 'seek', index: 0 });
-		command({ type: 'start' });
-	}
-
-	/** The spec's sentence rewind: one tap jumps back to the start of the sentence. */
 	function rewind() {
-		if (locked) return;
-		command({ type: 'jump', direction: -1, level: 'sentence' });
+		if (!locked) player.rewind();
 	}
-
-	function restart() {
-		command({ type: 'seek', index: 0 });
-	}
-
-	/** New chunk sizes regroup the text; the reader stays on the same word. */
-	function setChunkSize(value: string) {
-		const wordIndex = unit?.wordIndex ?? 0;
-		const wasRunning = running;
-		settings.chunkSize = Number(value) as ChunkSize;
-		reader = { index: unitIndexForWord(units, wordIndex), phase: { kind: 'ready' } };
-		timing = null;
-		if (wasRunning) command({ type: 'start' });
-	}
-
-	$effect(() => {
-		if (!running) return;
-		let previous = performance.now();
-		let frame = requestAnimationFrame(function tick(now) {
-			command({ type: 'elapsed', milliseconds: Math.max(0, now - previous) });
-			previous = now;
-			frame = requestAnimationFrame(tick);
-		});
-		return () => cancelAnimationFrame(frame);
-	});
 
 	function onkeydown(event: KeyboardEvent) {
 		if (event.metaKey || event.ctrlKey || event.altKey) return;
@@ -122,10 +69,10 @@
 		const target = event.target as HTMLElement | null;
 		const control = target?.closest('input, textarea, button, [role="slider"], [role="radio"]');
 		if (control && !control.hasAttribute('data-reader-stage')) return;
-		if (event.key === ' ') toggle();
+		if (event.key === ' ') player.toggle();
 		else if (event.key === 'ArrowLeft') rewind();
 		else if (event.key === 'ArrowRight' && !locked)
-			command({ type: 'jump', direction: 1, level: 'sentence' });
+			player.command({ type: 'jump', direction: 1, level: 'sentence' });
 		else return;
 		event.preventDefault();
 	}
@@ -134,39 +81,35 @@
 <svelte:window {onkeydown} />
 
 <div class="flex flex-col gap-6">
-	<button
-		type="button"
-		class="relative cursor-pointer rounded-lg bg-muted py-14 font-heading text-4xl text-foreground outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 sm:text-5xl"
-		onclick={locked ? toggle : rewind}
-		aria-label={locked ? 'Lesen oder pausieren' : 'Zum Satzanfang springen'}
-		data-reader-stage
-	>
-		<span class="absolute top-4 left-1/2 h-4 w-px bg-border"></span>
-		<span class="absolute bottom-4 left-1/2 h-4 w-px bg-border"></span>
-		{#if completed}
-			<span class="block h-[1.6em] leading-[1.6em] text-muted-foreground">Fertig gelesen</span>
-		{:else if unit}
-			<AnchorWord word={unit.text} />
-		{/if}
-	</button>
+	<Stage
+		word={player.unit?.text}
+		completed={player.completed}
+		appearance={settings}
+		label={locked ? 'Lesen oder pausieren' : 'Zum Satzanfang springen'}
+		onclick={locked ? () => player.toggle() : rewind}
+	/>
 
 	<div class="flex flex-col gap-2">
-		<Progress value={totalWords ? (wordsRead / totalWords) * 100 : 0} />
+		<Progress value={player.totalWords ? (player.wordsRead / player.totalWords) * 100 : 0} />
 		<p class="text-sm text-muted-foreground">
-			{wordsRead} von {totalWords} Wörtern · noch ca. {minutesLeft} Min.
+			{player.wordsRead} von {player.totalWords} Wörtern · noch ca. {minutesLeft} Min.
 		</p>
 	</div>
 
 	<div class="flex flex-wrap items-center gap-3">
-		<Button onclick={toggle}>
-			{#if running}<Pause />Pause{:else if completed}<ArrowCounterClockwise />Noch einmal{:else}<Play
-				/>Lesen{/if}
+		<Button onclick={() => player.toggle()}>
+			{#if player.running}<Pause />Pause{:else if player.completed}<ArrowCounterClockwise />Noch
+				einmal{:else}<Play />Lesen{/if}
 		</Button>
 		{#if !locked}
-			<Button variant="secondary" onclick={rewind} disabled={completed}>
+			<Button variant="secondary" onclick={rewind} disabled={player.completed}>
 				<SkipBack />Satzanfang
 			</Button>
-			<Button variant="ghost" onclick={restart} disabled={reader.index === 0 && !completed}>
+			<Button
+				variant="ghost"
+				onclick={() => player.restart()}
+				disabled={player.state.index === 0 && !player.completed}
+			>
 				<ArrowCounterClockwise />Von vorn
 			</Button>
 		{:else}
@@ -175,42 +118,92 @@
 	</div>
 
 	{#if !locked}
-		<div class="grid gap-6 sm:grid-cols-[1fr_auto_auto] sm:items-center">
-			<div class="flex items-center gap-3">
-				<Label class="shrink-0 text-muted-foreground">Tempo</Label>
-				<Slider
+		<section class="flex flex-col gap-4" aria-labelledby="reader-speed">
+			<h2 id="reader-speed" class="text-sm font-medium">Tempo</h2>
+			<div class="grid gap-6 sm:grid-cols-[1fr_auto_auto] sm:items-center">
+				<div class="flex items-center gap-3">
+					<Slider
+						type="single"
+						bind:value={settings.targetWpm}
+						min={MINIMUM_WPM}
+						max={maximumWpm}
+						step={10}
+						aria-label="Tempo in Wörtern pro Minute"
+					/>
+					<span class="w-20 shrink-0 text-right text-sm tabular-nums">{settings.targetWpm} WPM</span
+					>
+				</div>
+				<div class="flex items-center gap-3">
+					<Switch
+						id="adaptive"
+						checked={settings.speedMode === 'adaptive'}
+						onCheckedChange={(checked) => (settings.speedMode = checked ? 'adaptive' : 'fixed')}
+					/>
+					<Label for="adaptive">Adaptives Tempo</Label>
+				</div>
+				<RadioGroup.Root
+					class="flex items-center gap-4"
+					value={String(settings.chunkSize)}
+					onValueChange={(value) => player.setChunkSize(Number(value) as ChunkSize)}
+					aria-label="Wörter pro Anzeige"
+				>
+					{#each [1, 2, 3] as size (size)}
+						<div class="flex items-center gap-2">
+							<RadioGroup.Item value={String(size)} id="chunk-{size}" />
+							<Label for="chunk-{size}" class="font-normal">
+								{size === 1 ? '1 Wort' : `${size} Wörter`}
+							</Label>
+						</div>
+					{/each}
+				</RadioGroup.Root>
+			</div>
+		</section>
+
+		<section class="flex flex-col gap-4" aria-labelledby="reader-appearance">
+			<h2 id="reader-appearance" class="text-sm font-medium">Darstellung</h2>
+			<div class="flex flex-wrap items-center gap-x-8 gap-y-4">
+				<ToggleGroup.Root
 					type="single"
-					bind:value={settings.targetWpm}
-					min={MINIMUM_WPM}
-					max={MAXIMUM_WPM}
-					step={10}
-					aria-label="Tempo in Wörtern pro Minute"
-				/>
-				<span class="w-20 shrink-0 text-right text-sm tabular-nums">{settings.targetWpm} WPM</span>
+					variant="outline"
+					value={settings.font}
+					onValueChange={(value) => value && (settings.font = value as ReaderFont)}
+					aria-label="Schriftart"
+				>
+					{#each Object.entries(FONTS) as [value, font] (value)}
+						<ToggleGroup.Item {value} class={font.class}>{font.label}</ToggleGroup.Item>
+					{/each}
+				</ToggleGroup.Root>
+				<ToggleGroup.Root
+					type="single"
+					variant="outline"
+					value={settings.background}
+					onValueChange={(value) => value && (settings.background = value as ReaderBackground)}
+					aria-label="Hintergrund"
+				>
+					{#each Object.entries(BACKGROUNDS) as [value, colors] (value)}
+						<ToggleGroup.Item {value} class="gap-2">
+							<span
+								class="size-3.5 rounded-full border"
+								style:background-color={colors.background}
+								style:border-color={colors.guide}
+							></span>
+							{colors.label}
+						</ToggleGroup.Item>
+					{/each}
+				</ToggleGroup.Root>
+				<div class="flex min-w-48 flex-1 items-center gap-3">
+					<Label class="shrink-0 text-muted-foreground">Größe</Label>
+					<Slider
+						type="single"
+						bind:value={settings.fontSize}
+						min={FONT_SIZE.min}
+						max={FONT_SIZE.max}
+						step={FONT_SIZE.step}
+						aria-label="Schriftgröße in Pixeln"
+					/>
+					<span class="w-14 shrink-0 text-right text-sm tabular-nums">{settings.fontSize} px</span>
+				</div>
 			</div>
-			<div class="flex items-center gap-3">
-				<Switch
-					id="adaptive"
-					checked={settings.speedMode === 'adaptive'}
-					onCheckedChange={(checked) => (settings.speedMode = checked ? 'adaptive' : 'fixed')}
-				/>
-				<Label for="adaptive">Adaptives Tempo</Label>
-			</div>
-			<RadioGroup.Root
-				class="flex items-center gap-4"
-				value={String(settings.chunkSize)}
-				onValueChange={setChunkSize}
-				aria-label="Wörter pro Anzeige"
-			>
-				{#each [1, 2, 3] as size (size)}
-					<div class="flex items-center gap-2">
-						<RadioGroup.Item value={String(size)} id="chunk-{size}" />
-						<Label for="chunk-{size}" class="font-normal">
-							{size === 1 ? '1 Wort' : `${size} Wörter`}
-						</Label>
-					</div>
-				{/each}
-			</RadioGroup.Root>
-		</div>
+		</section>
 	{/if}
 </div>
