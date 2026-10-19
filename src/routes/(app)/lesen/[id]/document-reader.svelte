@@ -73,11 +73,11 @@
 {#if capped && profile}
 	<Alert.Root>
 		<Lightning />
-		<Alert.Title>Dein Verständnis trägt {profile.targetWpm} WPM.</Alert.Title>
+		<Alert.Title>Du verstehst Texte noch bei {profile.targetWpm} WPM.</Alert.Title>
 		<Alert.Description>
 			Lector Free liest bis {limit} WPM.
-			<a href="/preise" class="underline underline-offset-4">Mit Pro</a> liest du so schnell, wie die
-			Kalibrierung es dir bescheinigt.
+			<a href="/preise" class="underline underline-offset-4">Mit Pro</a> liest du in deinem kalibrierten
+			Tempo.
 		</Alert.Description>
 	</Alert.Root>
 {/if}

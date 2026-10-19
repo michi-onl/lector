@@ -131,7 +131,7 @@
 
 {#if step === 'intro'}
 	<section class="flex flex-col gap-4">
-		<h1 class="font-heading text-3xl font-bold">Wie schnell trägt dein Verständnis?</h1>
+		<h1 class="font-heading text-3xl font-bold">Finde dein Lesetempo</h1>
 		<p>
 			Lector zeigt dir nacheinander kurze Texte und erhöht dabei das Tempo, von
 			{CALIBRATION_LADDER[0]} bis höchstens {CALIBRATION_LADDER.at(-1)} Wörter pro Minute. Nach jedem

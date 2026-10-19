@@ -40,7 +40,7 @@
 	// RSVP reader
 
 	const text =
-		'Lesen soll nie der Engpass beim Lernen sein. Lector zeigt jeden Text Wort für Wort, genau so schnell, wie das eigene Verständnis es noch trägt. Ein kurzes Quiz prüft, ob der Inhalt angekommen ist, und kalibriert daran die Geschwindigkeit.';
+		'Lesen soll nie der Engpass beim Lernen sein. Lector zeigt jeden Text Wort für Wort, so schnell, wie du ihn noch verstehst. In einem kurzen Quiz findest du dieses Tempo heraus.';
 	const words = text.split(' ');
 
 	let wpm = $state(300);

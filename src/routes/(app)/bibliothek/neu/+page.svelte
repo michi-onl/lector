@@ -149,7 +149,7 @@
 			<a href="/kalibrierung" class="underline underline-offset-4">neu kalibrieren</a>
 		{:else}
 			<a href="/kalibrierung" class="underline underline-offset-4">Tempo kalibrieren</a>
-			und mit dem Tempo lesen, das dein Verständnis trägt
+			und so schnell lesen, wie du noch verstehst
 		{/if}
 	</p>
 </div>

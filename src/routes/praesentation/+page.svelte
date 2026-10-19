@@ -75,9 +75,7 @@
 		>
 			<Logo class="text-[min(18vw,12rem)]" />
 			{#if finished}
-				<p class="font-heading text-[min(4vw,2.5rem)] opacity-80">
-					So schnell, wie Ihr Verständnis es trägt.
-				</p>
+				<p class="font-heading text-[min(4vw,2.5rem)] opacity-80">So schnell, wie Sie verstehen.</p>
 			{:else}
 				<p class="text-sm opacity-50">Leertaste oder Klicker startet · F für Vollbild</p>
 			{/if}

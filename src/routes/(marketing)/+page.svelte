@@ -44,10 +44,10 @@
 </script>
 
 <svelte:head>
-	<title>Lector – lesen, so schnell dein Verständnis trägt</title>
+	<title>Lector – lesen, so schnell du verstehst</title>
 	<meta
 		name="description"
-		content="Lector zeigt Texte Wort für Wort, in der Geschwindigkeit, die dein Verständnis noch trägt. PDFs, Word-Dateien und Webartikel."
+		content="Lector zeigt dir Texte Wort für Wort, so schnell, wie du sie noch verstehst. Für PDFs, Word-Dateien und Webartikel."
 	/>
 </svelte:head>
 
@@ -61,8 +61,8 @@
 			Lesen soll nie der Engpass beim Lernen sein.
 		</p>
 		<p class="max-w-xl text-muted-foreground">
-			Lector zeigt deine Texte Wort für Wort, so schnell, wie dein Verständnis es noch trägt. Ein
-			Quiz belegt, dass der Inhalt angekommen ist.
+			Lector zeigt deine Texte Wort für Wort, so schnell, wie du sie noch verstehst. In einem kurzen
+			Quiz findest du dieses Tempo heraus.
 		</p>
 		<div class="flex flex-wrap justify-center gap-3">
 			<Button href="/kalibrierung"><Gauge />Tempo kalibrieren</Button>
@@ -101,9 +101,9 @@
 	<section class="flex flex-col items-start gap-4 rounded-xl bg-muted p-8">
 		<h2 class="font-heading text-2xl font-bold">PDFs, Word-Dateien und Webartikel</h2>
 		<p class="max-w-2xl text-muted-foreground">
-			Kostenlos liest Lector eingefügten Text, PDFs und Webartikel bis {FREE_MAXIMUM_WPM} Wörter pro Minute.
-			Mit Pro kommen Word und E-Books, unbegrenztes Tempo, eine Bibliothek auf allen Geräten und die Auswertung
-			deiner Quizantworten dazu.
+			Kostenlos liest du eingefügten Text, PDFs und Webartikel mit bis zu {FREE_MAXIMUM_WPM} Wörtern pro
+			Minute. Mit Pro kommen Word und E-Books, unbegrenztes Tempo, eine Bibliothek auf allen Geräten und
+			die Auswertung deiner Quizantworten dazu.
 		</p>
 		<Button href="/preise" variant="secondary">Preise ansehen</Button>
 	</section>

@@ -167,7 +167,7 @@
 			</ol>
 			{#if view.phase === 'finished'}
 				<p class="text-muted-foreground">
-					Wie schnell trägt dein eigenes Verständnis? Die Kalibrierung dauert etwa fünf Minuten.
+					Dein eigenes Tempo findest du in etwa fünf Minuten heraus.
 				</p>
 				<Button href="/kalibrierung" class="self-start">Selbst kalibrieren</Button>
 			{:else}
