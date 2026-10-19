@@ -6,7 +6,7 @@ Student project (DHBW): an RSVP speed reader whose speed is calibrated by compre
 
 - `SPEC.md` is the product spec: features, pricing, tech stack, presentation plan. Read it before planning work. It doesn't track progress.
 - The Planka board tracks who does what and how far it is. When the spec and the board disagree, point out the difference to the user rather than silently picking one.
-- `Fovea/` is the old React/Vite/Capacitor app, gitignored and local only. Use it as reference for the import pipeline and RSVP logic; build new code in SvelteKit on Cloudflare as the spec says.
+- Fovea (github.com/TimoGsl/Fovea) is the old React/Vite/Capacitor app. Its reader engine, calibration and import basics are ported; `docs/fovea-sichtung.md` records what was taken and what was left out (column detection, OCR, rule-based questions, position remapping). Look there before porting more; build new code in SvelteKit on Cloudflare as the spec says.
 
 ## Code
 
