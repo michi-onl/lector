@@ -51,7 +51,7 @@
 			? 'page'
 			: undefined;
 	const link =
-		'text-primary-foreground/75 transition-colors hover:text-primary-foreground aria-[current=page]:text-primary-foreground aria-[current=page]:underline aria-[current=page]:decoration-2 aria-[current=page]:underline-offset-8';
+		'rounded-lg px-3 py-2 text-primary-foreground/75 transition-colors hover:bg-black/10 hover:text-primary-foreground aria-[current=page]:bg-black/20 aria-[current=page]:text-primary-foreground';
 	const solid =
 		'rounded-lg bg-black/20 px-4 py-2 text-sm font-semibold transition-colors hover:bg-black/30 aria-[current=page]:bg-black/30';
 	// Liquid Glass: the page shows through, blurred; solid when the system asks for less transparency.
@@ -60,17 +60,17 @@
 </script>
 
 <header class="sticky top-0 z-40 bg-primary text-primary-foreground">
-	<div class="mx-auto flex h-16 max-w-5xl items-center gap-8 px-6">
+	<div class="mx-auto flex h-16 max-w-5xl items-center gap-5 px-6">
 		<a href="/" aria-label="Lector, zur Startseite">
 			<!-- The burgundy „o“ would vanish on the bar, so it turns pale rose here. -->
 			<Logo class="text-2xl [&>span]:text-[oklch(0.82_0.09_15)]" />
 		</a>
-		<nav aria-label="Hauptnavigation" class="hidden items-center gap-6 sm:flex">
+		<nav aria-label="Hauptnavigation" class="hidden items-center gap-1 sm:flex">
 			{#each links as { href, label, paths } (href)}
 				<a {href} class={link} aria-current={current(href, paths)}>{label}</a>
 			{/each}
 		</nav>
-		<div class="ml-auto flex items-center gap-5">
+		<div class="ml-auto flex items-center gap-2">
 			{#if user}
 				<a
 					href="/konto"
