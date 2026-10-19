@@ -13,12 +13,12 @@
 		{
 			icon: Gauge,
 			title: 'Gemessene Geschwindigkeit',
-			text: 'Ein kurzes Quiz findet das Tempo, bei dem du noch verstehst, was du liest – statt eines willkürlichen Maximums.'
+			text: 'Ein kurzes Quiz misst, bis zu welchem Tempo du noch verstehst, was du liest. Auf dieses Tempo stellt sich Lector ein.'
 		},
 		{
 			icon: Target,
 			title: 'Ein fester Fixationspunkt',
-			text: 'Jedes Wort erscheint an derselben Stelle, der burgunderrote Buchstabe zeigt, wohin der Blick fällt. Wie das „o“ im Logo.'
+			text: 'Jedes Wort erscheint an derselben Stelle, und ein burgunderroter Buchstabe zeigt, wohin der Blick fällt, so wie das „o“ im Logo.'
 		},
 		{
 			icon: Timer,
@@ -60,7 +60,7 @@
 			Lesen soll nie der Engpass beim Lernen sein.
 		</p>
 		<p class="max-w-xl text-muted-foreground">
-			Lector zeigt deine Texte Wort für Wort – so schnell, wie dein Verständnis es noch trägt. Ein
+			Lector zeigt deine Texte Wort für Wort, so schnell, wie dein Verständnis es noch trägt. Ein
 			Quiz belegt, dass der Inhalt angekommen ist.
 		</p>
 		<div class="flex flex-wrap justify-center gap-3">
@@ -86,8 +86,8 @@
 		<div class="flex max-w-2xl flex-col gap-2">
 			<h2 id="science" class="font-heading text-2xl font-bold">Auf Forschung gebaut</h2>
 			<p class="text-muted-foreground">
-				Es ist bewiesen, dass gutes Verständnis vom passenden Tempo abhängt und davon, im Text
-				zurückspringen zu können. Genau darauf baut Lector auf:
+				Gutes Verständnis hängt nachweislich vom passenden Tempo ab und davon, im Text
+				zurückspringen zu können. Darauf baut Lector auf:
 			</p>
 		</div>
 		<dl class="grid gap-px overflow-hidden rounded-lg border bg-border sm:grid-cols-3">
