@@ -1,5 +1,6 @@
 <script lang="ts">
 	import Logo from '#lib/components/logo.svelte';
+	import RsvpDemo from '#lib/components/reader/rsvp-demo.svelte';
 	import SiteHeader from '#lib/components/site-header.svelte';
 	import { Button } from '#lib/components/ui/button/index.js';
 	import ArrowCounterClockwise from 'phosphor-svelte/lib/ArrowCounterClockwise';
@@ -66,6 +67,7 @@
 			<Button href="/kalibrierung"><Gauge />Tempo kalibrieren</Button>
 			<Button href="/lesen" variant="secondary"><Play />Text lesen</Button>
 		</div>
+		<RsvpDemo class="mt-4 max-w-2xl" />
 	</section>
 
 	<section class="grid gap-8 sm:grid-cols-2" aria-label="Funktionen">

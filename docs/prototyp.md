@@ -4,20 +4,20 @@ Stand: 15. Oktober 2026. Dieses Dokument beschreibt, was der Prototyp kann, wie 
 
 ## Funktionen und Seiten
 
-| Seite                        | Inhalt                                                                                                 |
-| ---------------------------- | ------------------------------------------------------------------------------------------------------ |
-| `/`                          | Startseite: Wertversprechen, Funktionen, Antworten auf die Forschungskritik                            |
-| `/lesen`                     | Neuer Text: einfügen, Datei hochladen (PDF, DOCX, TXT) oder Webartikel per URL importieren             |
-| `/lesen/[id]`                | Reader mit ORP, adaptivem Tempo, Satz-Rewind, Chunk-Modus, optischer Anpassung und Volltext            |
-| `/bibliothek`                | Gespeicherte Texte mit Lesefortschritt und Restzeit, für Pro mit Download des Originals                |
-| `/kalibrierung`              | Quiz-Kalibrierung: bis zu sechs Texte von 200 bis 700 WPM, ermittelt die persönliche Verständnisgrenze |
-| `/preise`                    | Tarife Free, Pro, Business/Edu und Rechner für gesparte Lesestunden                                    |
-| `/registrieren`, `/anmelden` | Konto mit E-Mail und Passwort                                                                          |
-| `/konto`                     | Tarif wechseln, Browser-Daten ins Konto übernehmen, Auswertung aller Quizantworten (Pro)               |
-| `/praesentation`             | Erste Folie: Das Team stellt sich per RSVP vor, mit 300, 500 und 700 WPM                               |
-| `/live`                      | Live-Demo anlegen oder per Code beitreten                                                              |
-| `/live/[code]`               | Handyansicht für das Publikum: Fragen beantworten, eigenes Ergebnis sehen                              |
-| `/live/[code]/leitung`       | Beameransicht: QR-Code, Text im Tempo der Runde, eingehende Antworten, Ergebnisse, Speed-up-Kurve      |
+| Seite                        | Inhalt                                                                                                      |
+| ---------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| `/`                          | Startseite: Wertversprechen, RSVP-Demo mit steigendem Tempo, Funktionen, Antworten auf die Forschungskritik |
+| `/lesen`                     | Neuer Text: einfügen, Datei hochladen (PDF, DOCX, TXT) oder Webartikel per URL importieren                  |
+| `/lesen/[id]`                | Reader mit ORP, adaptivem Tempo, Satz-Rewind, Chunk-Modus, optischer Anpassung und Volltext                 |
+| `/bibliothek`                | Gespeicherte Texte mit Lesefortschritt und Restzeit, für Pro mit Download des Originals                     |
+| `/kalibrierung`              | Quiz-Kalibrierung: bis zu sechs Texte von 200 bis 700 WPM, ermittelt die persönliche Verständnisgrenze      |
+| `/preise`                    | Tarife Free, Pro, Business/Edu und Rechner für gesparte Lesestunden                                         |
+| `/registrieren`, `/anmelden` | Konto mit E-Mail und Passwort                                                                               |
+| `/konto`                     | Tarif wechseln, Browser-Daten ins Konto übernehmen, Auswertung aller Quizantworten (Pro)                    |
+| `/praesentation`             | Erste Folie: Das Team stellt sich per RSVP vor, mit 300, 500 und 700 WPM                                    |
+| `/live`                      | Live-Demo anlegen oder per Code beitreten                                                                   |
+| `/live/[code]`               | Handyansicht für das Publikum: Fragen beantworten, eigenes Ergebnis sehen                                   |
+| `/live/[code]/leitung`       | Beameransicht: QR-Code, Text im Tempo der Runde, eingehende Antworten, Ergebnisse, Speed-up-Kurve           |
 
 ### Abgleich mit der Spezifikation
 
