@@ -65,7 +65,7 @@
 		<Card.Header>
 			<Card.Title>Live-Demo leiten</Card.Title>
 			<Card.Description>
-				Für die Präsentation: Jede Runde liest einen Kalibrierungstext mit eigenem Tempo.
+				Für die Präsentation: Jede Runde zeigt einen Kalibrierungstext in eigenem Tempo.
 			</Card.Description>
 		</Card.Header>
 		<Card.Content>
@@ -82,8 +82,7 @@
 						<Button type="submit"><PresentationChart />Starten</Button>
 					</div>
 					<p class="text-sm {form?.message ? 'text-destructive' : 'text-muted-foreground'}">
-						{form?.message ??
-							'Ein bis vier Runden; die Spezifikation sieht zwei Geschwindigkeiten vor.'}
+						{form?.message ?? 'Ein bis vier Runden; für die Präsentation sind zwei vorgesehen.'}
 					</p>
 				</form>
 			{:else}

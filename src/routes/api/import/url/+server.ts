@@ -62,6 +62,6 @@ export const POST: RequestHandler = async ({ request }) => {
 
 	const html = decodeHtml(await readLimited(response), contentType);
 	const article = extractArticle(html, response.url || target.href);
-	if (!article) error(422, 'Auf der Seite wurde kein Artikeltext gefunden.');
+	if (!article) error(422, 'Auf der Seite steht kein Artikeltext.');
 	return json({ ...article, sourceUrl: response.url || target.href });
 };

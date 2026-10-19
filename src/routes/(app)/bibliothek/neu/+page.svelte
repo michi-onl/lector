@@ -29,8 +29,8 @@
 	let text = $state(
 		[
 			'Beim normalen Lesen springen die Augen in kurzen Sprüngen über die Zeile. Zwischen den Sprüngen ruhen sie für einen Sekundenbruchteil auf einem Wort; nur dann nehmen wir Text auf.',
-			'Lector dreht das Prinzip um: Die Wörter kommen zum Auge, nicht das Auge zu den Wörtern. Jedes Wort erscheint an derselben Stelle, und ein hervorgehobener Buchstabe zeigt, wohin der Blick fällt.',
-			'Wie schnell das gut geht, ist individuell. Deshalb misst Lector das Verständnis mit kurzen Quizfragen und stellt die Geschwindigkeit danach ein – so schnell, wie das eigene Verständnis es noch trägt.'
+			'Bei Lector kommen die Wörter zum Auge. Jedes Wort erscheint an derselben Stelle, und ein hervorgehobener Buchstabe zeigt, wohin der Blick fällt.',
+			'Wie schnell das gut geht, ist von Mensch zu Mensch verschieden. Deshalb prüft Lector das Verständnis mit kurzen Quizfragen und stellt die Geschwindigkeit danach ein.'
 		].join('\n\n')
 	);
 	let url = $state('');
@@ -204,8 +204,8 @@
 			<span class="font-medium">Datei auswählen oder hierher ziehen</span>
 			<span class="text-sm text-muted-foreground">
 				{#if plan === 'pro'}
-					PDF, Word (DOCX), E-Book (EPUB) oder TXT, bis {MAX_FILE_BYTES / 1024 / 1024} MB. Der Text wird
-					in deinem Browser ausgelesen, das Original in deinem Konto gespeichert.
+					PDF, Word (DOCX), E-Book (EPUB) oder TXT, bis {MAX_FILE_BYTES / 1024 / 1024} MB. Lector liest
+					den Text in deinem Browser aus und speichert das Original in deinem Konto.
 				{:else}
 					PDF oder TXT, bis {MAX_FILE_BYTES / 1024 / 1024} MB. Word (DOCX) und E-Books (EPUB) liest
 					<a href="/preise" class="underline underline-offset-4">Lector Pro</a>.
@@ -236,8 +236,7 @@
 				<Button type="submit" disabled={!url.trim() || !!busy}><Globe />Artikel laden</Button>
 			</div>
 			<p class="text-sm text-muted-foreground">
-				Lector lädt die Seite und übernimmt nur den Artikeltext – ohne Navigation, Werbung und
-				Kommentare.
+				Lector lädt die Seite und lässt Navigation, Werbung und Kommentare weg.
 			</p>
 		</form>
 	</Tabs.Content>

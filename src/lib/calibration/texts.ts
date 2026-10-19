@@ -19,7 +19,7 @@ export interface CalibrationText {
  * three options, so the runs are comparable and the order of the texts can change.
  */
 export const PRACTICE_TEXT =
-	'Beim Lesen zeigt dir Lector ein Wort nach dem anderen. Der farbig markierte Buchstabe bleibt dabei immer an derselben Stelle. Du kannst jederzeit kurz anhalten und in deiner eigenen Geschwindigkeit weiterlesen. Keine Sorge, denn Dieser erste Durchgang dient nur zum Ausprobieren und wird nicht gewertet. Danach erwarten dich verschiedene kurze Texte mit jeweils ein paar Fragen. Es geht hier nicht um Rekorde, sondern darum, deinen ganz eigenen, angenehmen Lesefluss zu finden.';
+	'Beim Lesen zeigt dir Lector ein Wort nach dem anderen. Der farbig markierte Buchstabe bleibt dabei an derselben Stelle. Du kannst jederzeit anhalten und weiterlesen, wenn du bereit bist. Dieser erste Durchgang ist nur zum Ausprobieren und zählt nicht. Danach kommen kurze Texte mit jeweils zwei Fragen. Gesucht ist das höchste Tempo, bei dem du noch verstehst, was du liest.';
 
 export const CALIBRATION_TEXTS: CalibrationText[] = [
 	{

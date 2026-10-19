@@ -3,6 +3,7 @@
 	import RsvpDemo from '#lib/components/reader/rsvp-demo.svelte';
 	import SiteHeader from '#lib/components/site-header.svelte';
 	import { Button } from '#lib/components/ui/button/index.js';
+	import { FREE_MAXIMUM_WPM } from '#lib/plan.js';
 	import ArrowCounterClockwise from 'phosphor-svelte/lib/ArrowCounterClockwise';
 	import Gauge from 'phosphor-svelte/lib/Gauge';
 	import Play from 'phosphor-svelte/lib/Play';
@@ -85,10 +86,7 @@
 	<section class="flex flex-col gap-6" aria-labelledby="science">
 		<div class="flex max-w-2xl flex-col gap-2">
 			<h2 id="science" class="font-heading text-2xl font-bold">Auf Forschung gebaut</h2>
-			<p class="text-muted-foreground">
-				Gutes Verständnis hängt nachweislich vom passenden Tempo ab und davon, im Text
-				zurückspringen zu können. Darauf baut Lector auf:
-			</p>
+			<p class="text-muted-foreground">Lector setzt drei Ergebnisse der Leseforschung um:</p>
 		</div>
 		<dl class="grid gap-px overflow-hidden rounded-lg border bg-border sm:grid-cols-3">
 			{#each findings as [finding, answer] (finding)}
@@ -103,8 +101,8 @@
 	<section class="flex flex-col items-start gap-4 rounded-xl bg-muted p-8">
 		<h2 class="font-heading text-2xl font-bold">PDFs, Word-Dateien und Webartikel</h2>
 		<p class="max-w-2xl text-muted-foreground">
-			Kostenlos liest Lector eingefügten Text und Webartikel bis 300 Wörter pro Minute. Mit Pro
-			kommen PDF und Word, unbegrenztes Tempo, eine Bibliothek auf allen Geräten und die Auswertung
+			Kostenlos liest Lector eingefügten Text, PDFs und Webartikel bis {FREE_MAXIMUM_WPM} Wörter pro Minute.
+			Mit Pro kommen Word und E-Books, unbegrenztes Tempo, eine Bibliothek auf allen Geräten und die Auswertung
 			deiner Quizantworten dazu.
 		</p>
 		<Button href="/preise" variant="secondary">Preise ansehen</Button>

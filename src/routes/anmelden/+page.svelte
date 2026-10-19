@@ -17,7 +17,7 @@
 <main class="mx-auto flex max-w-3xl flex-col gap-10 p-6">
 	<AuthForm mode="sign-in" {form}>
 		{#snippet footer()}
-			Noch kein Konto?&nbsp;
+			Du hast noch kein Konto?&nbsp;
 			<a
 				href="/registrieren{next ? `?weiter=${encodeURIComponent(next)}` : ''}"
 				class="text-foreground underline underline-offset-4">Konto anlegen</a

@@ -4,7 +4,7 @@
  * its claims must stay true for the speeds below.
  */
 export const DEMO_TEXT =
-	'Diesen Text liest du gerade mit Lector. Jedes Wort erscheint an derselben Stelle, deine Augen müssen nicht mehr wandern. Der farbige Buchstabe zeigt, wohin dein Blick fällt. Merkst du, wie das Tempo steigt? Lange Wörter wie Verständniskontrolle bleiben trotzdem etwas länger stehen, Satzenden auch. Inzwischen sind es mehr als doppelt so viele Wörter pro Minute wie am Anfang. Ob du noch alles verstehst, prüft Lector mit einem kurzen Quiz – und richtet das Tempo danach.';
+	'Diesen Text liest du gerade mit Lector. Jedes Wort erscheint an derselben Stelle, deine Augen müssen nicht mehr wandern. Der farbige Buchstabe zeigt, wohin dein Blick fällt. Merkst du, wie das Tempo steigt? Lange Wörter wie Verständniskontrolle bleiben trotzdem etwas länger stehen, Satzenden auch. Inzwischen sind es mehr als doppelt so viele Wörter pro Minute wie am Anfang. Ob du noch alles verstehst, prüft Lector mit einem kurzen Quiz und richtet das Tempo danach.';
 
 export const DEMO_SPEED = { from: 250, to: 700 } as const;
 

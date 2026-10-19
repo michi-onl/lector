@@ -133,9 +133,9 @@
 	<section class="flex flex-col gap-4">
 		<h1 class="font-heading text-3xl font-bold">Wie schnell trägt dein Verständnis?</h1>
 		<p>
-			Du liest kurze Texte, jeden etwas schneller als den vorherigen – von {CALIBRATION_LADDER[0]}
-			bis {CALIBRATION_LADDER.at(-1)} Wörtern pro Minute. Nach jedem Text folgen zwei Fragen zum Inhalt.
-			Sobald das Verständnis zweimal nicht mehr reicht, ist die Kalibrierung vorbei.
+			Lector zeigt dir nacheinander kurze Texte und erhöht dabei das Tempo, von
+			{CALIBRATION_LADDER[0]} bis höchstens {CALIBRATION_LADDER.at(-1)} Wörter pro Minute. Nach jedem
+			Text beantwortest du zwei Fragen zum Inhalt. Hast du zweimal nicht genug verstanden, endet die Kalibrierung.
 		</p>
 		<p class="text-muted-foreground">
 			Das Tempo ist während eines Textes fest, pausieren kannst du jederzeit. Wenn du eine Antwort
@@ -153,7 +153,7 @@
 		</div>
 	</section>
 {:else if step === 'practice'}
-	<p class="text-muted-foreground">Probelauf mit {PRACTICE_WPM} WPM – wird nicht bewertet.</p>
+	<p class="text-muted-foreground">Probelauf mit {PRACTICE_WPM} WPM, ohne Wertung.</p>
 	<Reader
 		blocks={textBlocks(PRACTICE_TEXT)}
 		settings={settingsAt(PRACTICE_WPM)}

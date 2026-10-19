@@ -66,7 +66,7 @@
 	<Stage
 		word={player.unit?.text}
 		completed={player.completed}
-		completedText={reducedMotion ? 'Tippen für noch einmal' : 'Gleich noch einmal'}
+		completedText={reducedMotion ? 'Zum Wiederholen tippen' : 'Gleich noch einmal'}
 		appearance={settings}
 		label="Demo abspielen oder pausieren"
 		onclick={() => {

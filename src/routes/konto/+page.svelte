@@ -95,10 +95,10 @@
 			</Card.Title>
 			<Card.Description>
 				{#if pro}
-					PDF und Word, unbegrenztes Tempo, Bibliothek und Fortschritt auf allen Geräten, Auswertung
-					deiner Kalibrierungen.
+					Word und E-Books, unbegrenztes Tempo, Bibliothek und Fortschritt auf allen Geräten,
+					Auswertung deiner Kalibrierungen.
 				{:else}
-					Text und Webartikel bis {FREE_MAXIMUM_WPM} WPM, Bibliothek in diesem Browser.
+					Text, PDFs und Webartikel bis {FREE_MAXIMUM_WPM} WPM, Bibliothek in diesem Browser.
 				{/if}
 			</Card.Description>
 		</Card.Header>
@@ -110,9 +110,8 @@
 				</Button>
 			</form>
 			<span class="text-sm text-muted-foreground">
-				Prototyp: Der Wechsel ist kostenlos und ohne Zahlung. <a
-					href="/preise"
-					class="underline underline-offset-4">Preise</a
+				Prototyp: Der Wechsel kostet nichts. <a href="/preise" class="underline underline-offset-4"
+					>Preise</a
 				>
 			</span>
 		</Card.Footer>
@@ -125,7 +124,7 @@
 				<Card.Description>
 					{localTexts === 1 ? 'Ein Text liegt' : `${localTexts} Texte liegen`} noch in der Bibliothek
 					dieses Browsers. Mit Fortschritt, Einstellungen und Leseprofil ins Konto übernehmen? Texte,
-					die schon im Konto sind, werden übersprungen.
+					die schon im Konto sind, überspringt Lector.
 				</Card.Description>
 			</Card.Header>
 			<Card.Footer class="flex flex-wrap items-center gap-3">
@@ -151,7 +150,7 @@
 		{#if !data.evaluation}
 			<p class="text-muted-foreground">
 				Mit Pro speichert Lector jede Antwort deiner Kalibrierungen und zeigt, wie dein Verständnis
-				mit dem Tempo sinkt – und wie sich deine Grenze über die Zeit verschiebt.
+				mit dem Tempo sinkt und wie sich deine Grenze mit der Zeit verschiebt.
 			</p>
 		{:else if !data.evaluation.curve.length}
 			<p class="text-muted-foreground">

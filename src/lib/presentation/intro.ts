@@ -13,6 +13,6 @@ export const INTRO_SEGMENTS = [
 	},
 	{
 		wpm: 700,
-		text: 'Und das hier sind 700 Wörter pro Minute. Haben Sie noch alles verstanden? Genau das misst Lector – und liest so schnell, wie Ihr Verständnis es trägt.'
+		text: 'Und das hier sind 700 Wörter pro Minute. Haben Sie noch alles verstanden? Genau das misst Lector, um so schnell zu lesen, wie Ihr Verständnis es trägt.'
 	}
 ] as const;

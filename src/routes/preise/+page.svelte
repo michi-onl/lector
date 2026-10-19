@@ -33,7 +33,7 @@
 			features: [
 				'Text einfügen, TXT, PDF und Webartikel',
 				`Bis ${FREE_MAXIMUM_WPM} Wörter pro Minute`,
-				'Kalibrierung per Quiz, mit deiner Verbesserung',
+				'Kalibrierung per Quiz, mit Vergleich zur letzten',
 				`Bis zu ${FREE_LIBRARY_SIZE} Texte in der Bibliothek dieses Browsers`
 			]
 		},
@@ -75,8 +75,9 @@
 	<div class="flex max-w-2xl flex-col gap-2">
 		<h1 class="font-heading text-3xl font-bold">Preise</h1>
 		<p class="text-muted-foreground">
-			Lector verkauft keine maximale, sondern eine gemessene Geschwindigkeit. Kostenlos lesen, mit
-			Pro die volle Geschwindigkeit nutzen, die dein Verständnis trägt.
+			Lector misst mit einem Quiz, wie schnell du lesen kannst, ohne den Faden zu verlieren, und
+			liest dann in diesem Tempo. Mit Free geht das bis {FREE_MAXIMUM_WPM} Wörter pro Minute, mit Pro
+			ohne Obergrenze.
 		</p>
 	</div>
 
@@ -119,7 +120,7 @@
 		<div class="flex flex-col gap-1">
 			<h2 id="calculator" class="font-heading text-2xl font-bold">Gesparte Lesestunden</h2>
 			<p class="text-sm text-muted-foreground">
-				Wie viel Zeit Lector im Monat spart, bei rund {WORDS_PER_PAGE} Wörtern pro Seite.
+				So viel Zeit spart Lector im Monat, bei rund {WORDS_PER_PAGE} Wörtern pro Seite.
 			</p>
 		</div>
 		<div class="grid gap-8 md:grid-cols-[1fr_auto] md:items-center">

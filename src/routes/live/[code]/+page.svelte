@@ -87,7 +87,8 @@
 		<section class="flex flex-col gap-3">
 			<h1 class="font-heading text-3xl font-bold">Du bist dabei!</h1>
 			<p class="text-muted-foreground">
-				Gleich läuft vorne ein Text, Wort für Wort. Lies mit – danach kommen hier zwei Fragen dazu.
+				Gleich läuft vorne ein Text, Wort für Wort. Lies mit, danach erscheinen hier zwei Fragen
+				dazu.
 			</p>
 			<p class="text-sm text-muted-foreground">
 				{view.participants === 1 ? 'Eine Person ist' : `${view.participants} Personen sind`} dabei.

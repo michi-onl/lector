@@ -30,7 +30,7 @@
 		<Card.Description>
 			{mode === 'sign-in'
 				? 'Mit deinem Lector-Konto.'
-				: 'Kostenlos. Mit Lector Pro liegen Bibliothek, Fortschritt und Auswertung im Konto.'}
+				: 'Das Konto kostet nichts. Mit Lector Pro findest du darin deine Texte, deinen Lesefortschritt und die Auswertung deiner Kalibrierungen, auf jedem Gerät.'}
 		</Card.Description>
 	</Card.Header>
 	<Card.Content>

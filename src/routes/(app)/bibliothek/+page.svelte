@@ -46,11 +46,12 @@
 		<h1 class="font-heading text-3xl font-bold">Bibliothek</h1>
 		<p class="text-sm text-muted-foreground">
 			{#if synced}
-				Deine Bibliothek liegt in deinem Konto, mit Fortschritt auf allen Geräten.
+				Lector speichert deine Texte und deinen Fortschritt im Konto, sodass du auf jedem Gerät
+				weiterlesen kannst.
 			{:else}
-				{items.length} von {size} Texten. Die Bibliothek liegt nur in diesem Browser. Mit
-				<a href="/preise" class="underline underline-offset-4">Lector Pro</a> ist sie unbegrenzt und auf
-				allen Geräten dabei.
+				{items.length} von {size} Texten, gespeichert in diesem Browser. Mit
+				<a href="/preise" class="underline underline-offset-4">Lector Pro</a> hast du beliebig viele Texte
+				auf allen deinen Geräten.
 			{/if}
 		</p>
 	</div>
@@ -132,8 +133,8 @@
 		<Card.Header>
 			<Card.Title>Noch nichts gespeichert</Card.Title>
 			<Card.Description>
-				Füge einen Text ein, lade eine Datei hoch oder importiere einen Webartikel; Lector merkt
-				sich, wo du aufgehört hast.
+				Füge einen Text ein, lade eine Datei hoch oder importiere einen Webartikel. Lector speichert
+				deinen Lesefortschritt.
 			</Card.Description>
 		</Card.Header>
 		<Card.Footer>
