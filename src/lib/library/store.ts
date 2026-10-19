@@ -7,6 +7,7 @@ import {
 	sha256,
 	sortEntries,
 	wordCount,
+	LibraryFullError,
 	type LibraryEntry,
 	type LibraryProgress,
 	type NewDocument,
@@ -83,23 +84,24 @@ export async function listLibrary(): Promise<LibraryItem[]> {
 }
 
 /**
- * Stores pasted or imported text; a text already in the library returns its entry. The
- * original file stays out: the browser library keeps only the text.
+ * Stores pasted or imported text; a text already in the library returns its entry, even when
+ * the library holds `size` texts and takes no new one. The original file stays out: the
+ * browser library keeps only the text.
  */
-export async function addDocument({
-	blocks,
-	format,
-	title,
-	fileName,
-	sourceUrl
-}: NewDocument): Promise<LibraryEntry> {
+export async function addDocument(
+	{ blocks, format, title, fileName, sourceUrl }: NewDocument,
+	size = Infinity
+): Promise<LibraryEntry> {
 	if (!blocks.length) throw new Error('Der Text ist leer.');
 	const hash = await sha256(canonicalText(blocks));
 	const db = await database();
-	const existing = await done<LibraryEntry | undefined>(
-		db.transaction('documents').objectStore('documents').index('sha256').get(hash)
-	);
+	const documents = db.transaction('documents').objectStore('documents');
+	const [existing, count] = await Promise.all([
+		done<LibraryEntry | undefined>(documents.index('sha256').get(hash)),
+		done(documents.count())
+	]);
 	if (existing) return existing;
+	if (count >= size) throw new LibraryFullError(size);
 	const now = new Date();
 	const entry: LibraryEntry = {
 		id: crypto.randomUUID(),

@@ -1,6 +1,6 @@
 import { api } from '#lib/api.js';
 import { loadProfile, type StoredProfile } from '#lib/calibration/profile.js';
-import { syncs, type Plan } from '#lib/plan.js';
+import { appearanceFor, syncs, type Plan } from '#lib/plan.js';
 import { parsePreferences, type Preferences } from './preferences.js';
 
 export const PREFERENCES_KEY = 'lector.settings';
@@ -30,9 +30,12 @@ export function saveLocalPreferences(storage: PreferenceStorage, preferences: Pr
 	storage.setItem(PREFERENCES_KEY, JSON.stringify(parsePreferences(preferences)));
 }
 
-/** Preferences of the current person: Pro from the account, everyone else from this browser. */
+/**
+ * Preferences of the current person: Pro from the account, everyone else from this browser,
+ * in the look the tariff allows.
+ */
 export async function loadPreferences(plan: Plan): Promise<Preferences> {
-	if (!syncs(plan)) return loadLocalPreferences(localStorage);
+	if (!syncs(plan)) return appearanceFor(plan, loadLocalPreferences(localStorage));
 	const stored = await api<Preferences | null>('/api/settings').catch(() => null);
 	if (stored) return stored;
 	const profile = await api<StoredProfile | null>('/api/profile').catch(() => null);

@@ -29,11 +29,26 @@ export function blocksFromParagraphs(paragraphs: string[]): TextBlock[] {
 	return textBlocks(paragraphs.join('\n\n'));
 }
 
+/** Blocks of a text in chapters, as an e-book has them; the reader pauses between chapters. */
+export function blocksFromChapters(chapters: string[][]): TextBlock[] {
+	return chapters.flatMap((paragraphs, chapter) => {
+		const blocks = blocksFromParagraphs(paragraphs).map((block) => ({
+			...block,
+			id: `c${chapter}${block.id}`,
+			sectionId: `c${chapter}`,
+			chapterId: `c${chapter}`
+		}));
+		if (blocks.length) blocks[blocks.length - 1].boundaryAfter = 'chapter';
+		return blocks;
+	});
+}
+
 /** Reads only the first bytes, so an unsupported file is rejected before it is loaded. */
 export async function fileFormat(file: File): Promise<FileFormat> {
 	const head = new Uint8Array(await file.slice(0, 1024).arrayBuffer());
 	const format = detectFormat(file.name, head);
-	if (!format) throw new ImportError('Lector liest PDF, Word (DOCX) und Textdateien (TXT).');
+	if (!format)
+		throw new ImportError('Lector liest PDF, Word (DOCX), E-Books (EPUB) und Textdateien (TXT).');
 	return format;
 }
 
@@ -55,6 +70,11 @@ export async function importFile(
 	} else if (format === 'docx') {
 		const { extractDocx } = await import('./docx.js');
 		blocks = blocksFromParagraphs(await extractDocx(data));
+	} else if (format === 'epub') {
+		const { extractEpub } = await import('./epub.js');
+		const epub = await extractEpub(data);
+		title = epub.title;
+		blocks = blocksFromChapters(epub.chapters);
 	} else {
 		blocks = textBlocks(decodeText(data));
 	}

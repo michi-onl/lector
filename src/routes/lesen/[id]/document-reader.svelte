@@ -9,7 +9,7 @@
 		type OpenedDocument,
 		type ReadingUpdate
 	} from '#lib/library/index.js';
-	import { maximumWpm, type Plan } from '#lib/plan.js';
+	import { allowsStyles, maximumWpm, type Plan } from '#lib/plan.js';
 	import type { Preferences } from '#lib/preferences/preferences.js';
 	import { preferenceSaver } from '#lib/preferences/store.js';
 	import Lightning from 'phosphor-svelte/lib/Lightning';
@@ -87,5 +87,6 @@
 	{start}
 	bind:settings
 	maximumWpm={limit}
+	styles={allowsStyles(plan)}
 	onprogress={(update) => (pending = mergeUpdates(pending, update))}
 />

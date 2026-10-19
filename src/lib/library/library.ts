@@ -4,11 +4,12 @@ import type { StructureBoundary, TextBlock } from '#lib/reader/index.js';
  * The library of the free tier lives in the browser. Entries and progress mirror the D1
  * tables `document` and `progress`, so an account can take them over field by field.
  */
-export type DocumentFormat = 'pdf' | 'docx' | 'txt' | 'url' | 'text';
+export type DocumentFormat = 'pdf' | 'docx' | 'epub' | 'txt' | 'url' | 'text';
 
 export const FORMAT_LABELS: Record<DocumentFormat, string> = {
 	pdf: 'PDF',
 	docx: 'Word',
+	epub: 'E-Book',
 	txt: 'Textdatei',
 	url: 'Webartikel',
 	text: 'Eingefügter Text'
@@ -28,6 +29,13 @@ export interface LibraryEntry {
 	hasSource?: boolean;
 	createdAt: string;
 	lastOpenedAt: string | null;
+}
+
+/** The library holds as many texts as the tariff allows; the message is for the reader. */
+export class LibraryFullError extends Error {
+	constructor(readonly size: number) {
+		super(`In der Bibliothek von Lector Free haben ${size} Texte Platz.`);
+	}
 }
 
 /** A text on its way into the library: pasted, or extracted from a file or web page. */
@@ -148,7 +156,7 @@ export function sortEntries(entries: LibraryEntry[]): LibraryEntry[] {
 /** What an account may store per text: about a thousand pages. */
 export const MAX_TEXT_CHARACTERS = 5_000_000;
 
-const FORMATS: readonly DocumentFormat[] = ['pdf', 'docx', 'txt', 'url', 'text'];
+const FORMATS: readonly DocumentFormat[] = ['pdf', 'docx', 'epub', 'txt', 'url', 'text'];
 const BOUNDARIES: readonly StructureBoundary[] = [
 	'none',
 	'sentence',

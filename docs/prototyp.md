@@ -1,16 +1,16 @@
 # Prototyp: Aufbau und Funktionen
 
-Stand: 15. Oktober 2026. Dieses Dokument beschreibt, was der Prototyp kann, wie er aufgebaut ist und wie man ihn in der Präsentation vorführt. Produkt und Preise stehen in [`SPEC.md`](../SPEC.md), die Herkunft der Leseengine in [`fovea-sichtung.md`](fovea-sichtung.md).
+Stand: 19. Oktober 2026. Dieses Dokument beschreibt, was der Prototyp kann, wie er aufgebaut ist und wie man ihn in der Präsentation vorführt. Produkt und Preise stehen in [`SPEC.md`](../SPEC.md), die Herkunft der Leseengine in [`fovea-sichtung.md`](fovea-sichtung.md).
 
 ## Funktionen und Seiten
 
 | Seite                        | Inhalt                                                                                                      |
 | ---------------------------- | ----------------------------------------------------------------------------------------------------------- |
 | `/`                          | Startseite: Wertversprechen, RSVP-Demo mit steigendem Tempo, Funktionen, Antworten auf die Forschungskritik |
-| `/lesen`                     | Neuer Text: einfügen, Datei hochladen (PDF, DOCX, TXT) oder Webartikel per URL importieren                  |
+| `/lesen`                     | Neuer Text: einfügen, Datei hochladen (PDF, DOCX, EPUB, TXT) oder Webartikel per URL importieren            |
 | `/lesen/[id]`                | Reader mit ORP, adaptivem Tempo, Satz-Rewind, Chunk-Modus, optischer Anpassung und Volltext                 |
-| `/bibliothek`                | Gespeicherte Texte mit Lesefortschritt und Restzeit, für Pro mit Download des Originals                     |
-| `/kalibrierung`              | Quiz-Kalibrierung: bis zu sechs Texte von 200 bis 700 WPM, ermittelt die persönliche Verständnisgrenze      |
+| `/bibliothek`                | Gespeicherte Texte mit Lesefortschritt und Restzeit, für Free bis zu 3, für Pro mit Download des Originals  |
+| `/kalibrierung`              | Quiz-Kalibrierung: bis zu sechs Texte von 200 bis 700 WPM, Verständnisgrenze und Veränderung zur letzten    |
 | `/preise`                    | Tarife Free, Pro, Business/Edu und Rechner für gesparte Lesestunden                                         |
 | `/registrieren`, `/anmelden` | Konto mit E-Mail und Passwort                                                                               |
 | `/konto`                     | Tarif wechseln, Browser-Daten ins Konto übernehmen, Auswertung aller Quizantworten (Pro)                    |
@@ -21,35 +21,37 @@ Stand: 15. Oktober 2026. Dieses Dokument beschreibt, was der Prototyp kann, wie 
 
 ### Abgleich mit der Spezifikation
 
-| Spezifikation                       | Umsetzung                                                                                        |
-| ----------------------------------- | ------------------------------------------------------------------------------------------------ |
-| Datei-Upload PDF, DOCX, TXT         | im Browser mit pdf.js (Legacy-Build) und mammoth; OCR für Scans fehlt noch (Hinweis beim Import) |
-| URL-Scraping                        | Worker lädt die Seite, Readability auf linkedom extrahiert den Artikel                           |
-| Geschwindigkeit selbst steuern      | Regler 100–1.000 WPM, für Free bis 300 WPM                                                       |
-| Kalibrierung per Quiz               | sechs Texte mit je zwei Fragen, „Weiß ich nicht“ zählt als nicht verstanden                      |
-| Optische Anpassung                  | Schriftart (Serif, Sans, Mono), Hintergrund (Creme, Weiß, Sepia, Nacht), Schriftgröße 28–96 px   |
-| Bibliothek mit Lesefortschritt      | Free im Browser (IndexedDB), Pro im Konto (D1 und R2)                                            |
-| ORP-Hervorhebung                    | Buchstabe nach gemessener Glyphenbreite, auf festem Ankerpunkt                                   |
-| Adaptive Geschwindigkeit            | länger bei langen Wörtern, Zahlen, Satzzeichen und Satzenden, kürzer bei Funktionswörtern        |
-| Satz-Rewind                         | Tipp aufs Wort oder Pfeil links                                                                  |
-| Chunk-Modus                         | 1, 2 oder 3 Wörter pro Frame                                                                     |
-| Präsentation: RSVP-Einstieg         | `/praesentation`                                                                                 |
-| Präsentation: Live-Demo mit QR-Code | `/live`                                                                                          |
-| Präsentation: Speed-up-Kurve        | Abschluss der Live-Demo; persönliche Kurve in der Auswertung auf `/konto`                        |
+| Spezifikation                       | Umsetzung                                                                                                                |
+| ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| Datei-Upload PDF, DOCX, EPUB, TXT   | im Browser mit pdf.js (Legacy-Build), mammoth und eigenem EPUB-Leser; OCR für Scans fehlt noch (Hinweis beim Import)     |
+| URL-Scraping                        | Worker lädt die Seite, Readability auf linkedom extrahiert den Artikel                                                   |
+| Geschwindigkeit selbst steuern      | Regler 100–1.000 WPM, für Free bis 300 WPM                                                                               |
+| Kalibrierung per Quiz               | sechs Texte mit je zwei Fragen, „Weiß ich nicht“ zählt als nicht verstanden                                              |
+| Optische Anpassung                  | Schriftart (Serif, Sans, Mono), Hintergrund (Creme, Weiß, Sepia, Nacht), Schriftgröße 28–96 px; Free nur Serif auf Creme |
+| Bibliothek mit Lesefortschritt      | Free im Browser (IndexedDB), Pro im Konto (D1 und R2)                                                                    |
+| ORP-Hervorhebung                    | Buchstabe nach gemessener Glyphenbreite, auf festem Ankerpunkt                                                           |
+| Adaptive Geschwindigkeit            | länger bei langen Wörtern, Zahlen, Satzzeichen und Satzenden, kürzer bei Funktionswörtern                                |
+| Satz-Rewind                         | Tipp aufs Wort oder Pfeil links                                                                                          |
+| Chunk-Modus                         | 1, 2 oder 3 Wörter pro Frame                                                                                             |
+| Präsentation: RSVP-Einstieg         | `/praesentation`                                                                                                         |
+| Präsentation: Live-Demo mit QR-Code | `/live`                                                                                                                  |
+| Präsentation: Speed-up-Kurve        | Abschluss der Live-Demo; persönliche Kurve in der Auswertung auf `/konto`                                                |
 
 ## Tarife im Prototyp
 
 Der Prototyp nimmt kein Geld. Ein Konto wechselt auf `/konto` mit einem Klick zwischen Free und Pro, damit sich beide Tarife vorführen lassen.
 
-| Regel           | Free                       | Pro                                      |
-| --------------- | -------------------------- | ---------------------------------------- |
-| Formate         | eingefügter Text, TXT, URL | zusätzlich PDF und DOCX                  |
-| Tempo           | bis 300 WPM                | bis 1.000 WPM                            |
-| Speicherort     | dieser Browser             | Konto, auf allen Geräten                 |
-| Originaldateien | –                          | in R2, aus der Bibliothek herunterladbar |
-| Quiz-Auswertung | –                          | Kurve und Verlauf auf `/konto`           |
+| Regel           | Free                               | Pro                                      |
+| --------------- | ---------------------------------- | ---------------------------------------- |
+| Formate         | eingefügter Text, TXT, PDF, URL    | zusätzlich DOCX und EPUB                 |
+| Tempo           | bis 300 WPM                        | bis 1.000 WPM                            |
+| Bibliothek      | bis zu 3 Texte                     | unbegrenzt                               |
+| Speicherort     | dieser Browser                     | Konto, auf allen Geräten                 |
+| Originaldateien | –                                  | in R2, aus der Bibliothek herunterladbar |
+| Quiz            | Grenze und Veränderung zur letzten | dazu Kurve und Verlauf auf `/konto`      |
+| Darstellung     | Serif auf Creme, Schriftgröße frei | alle Schriften und Hintergründe          |
 
-Die Regeln stehen an einer Stelle, in `src/lib/plan.ts`. Misst die Kalibrierung bei Free mehr als 300 WPM, zeigt der Reader das gemessene Tempo und verweist auf Pro. Das ist der Moment, in dem das Produkt seinen Wert selbst belegt.
+Die Regeln stehen an einer Stelle, in `src/lib/plan.ts`. Ist die Bibliothek von Free voll, sagt `/lesen` das vor dem Import; ein Text, der schon in der Bibliothek liegt, öffnet trotzdem. Misst die Kalibrierung bei Free mehr als 300 WPM, zeigt der Reader das gemessene Tempo und verweist auf Pro. Das ist der Moment, in dem das Produkt seinen Wert selbst belegt.
 
 ## Architektur
 
@@ -83,14 +85,15 @@ flowchart LR
 
 ### Import
 
-| Format | Ablauf                                                                                                                                                                                                                                               |
-| ------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| PDF    | pdf.js liefert positionierte Textstücke. `pdf-layout.ts` setzt daraus Zeilen, entfernt Kopf- und Fußzeilen und Seitenzahlen, trennt Absätze an größeren Abständen, Schriftgrößenwechseln und kurzen Zeilen mit Satzende und hebt Silbentrennung auf. |
-| DOCX   | mammoth liefert den Text absatzweise.                                                                                                                                                                                                                |
-| TXT    | UTF-8, sonst Windows-1252; Leerzeilen trennen Absätze.                                                                                                                                                                                               |
-| URL    | Der Worker lädt höchstens 5 MB, beachtet den Zeichensatz, Readability findet den Artikel, Fußnotenmarker wie „[2]“ entfallen.                                                                                                                        |
+| Format | Ablauf                                                                                                                                                                                                                                                                                                                |
+| ------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| PDF    | pdf.js liefert positionierte Textstücke. `pdf-layout.ts` setzt daraus Zeilen, entfernt Kopf- und Fußzeilen und Seitenzahlen, trennt Absätze an größeren Abständen, Schriftgrößenwechseln und kurzen Zeilen mit Satzende und hebt Silbentrennung auf.                                                                  |
+| DOCX   | mammoth liefert den Text absatzweise.                                                                                                                                                                                                                                                                                 |
+| EPUB   | `zip.ts` entpackt mit dem `DecompressionStream` des Browsers, `epub.ts` folgt `container.xml` und dem Spine der OPF-Datei und liest jedes Kapitel mit `DOMParser`. Inhaltsverzeichnis, Fußnoten und Seitenmarker entfallen; jedes Kapitel endet mit einer Kapitelpause. E-Books mit DRM werden mit Hinweis abgelehnt. |
+| TXT    | UTF-8, sonst Windows-1252; Leerzeilen trennen Absätze.                                                                                                                                                                                                                                                                |
+| URL    | Der Worker lädt höchstens 5 MB, beachtet den Zeichensatz, Readability findet den Artikel, Fußnotenmarker wie „[2]“ entfallen.                                                                                                                                                                                         |
 
-Das Format erkennt Lector an den ersten Bytes, nicht am Dateinamen. Grenzen: 50 MB pro Datei, 1.000 PDF-Seiten, 5 Mio. Zeichen Text.
+Das Format erkennt Lector an den ersten Bytes, nicht am Dateinamen; nur DOCX verrät sich als ZIP-Archiv erst durch die Endung. Grenzen: 50 MB pro Datei, 1.000 PDF-Seiten, 5 Mio. Zeichen Text.
 
 ## Datenmodell
 
@@ -141,12 +144,12 @@ Für den Einstieg `/praesentation` öffnen und mit **F** auf Vollbild schalten. 
 
 ## Tests
 
-`npm test` prüft die Leseengine, die Kalibrierung, die Bibliotheksregeln, die PDF-Layoutheuristiken, die Artikelextraktion, die serverseitige Prüfung von Kalibrierungsläufen und die Regeln der Live-Demo (194 Tests). Durchgespielt im Browser wurden: Import von PDF, DOCX, TXT und Wikipedia-Artikel, Registrierung, Wechsel zu Pro mit Übernahme der Browser-Bibliothek, Upload und Download des Originals, Kalibrierung mit Speicherung und Auswertung, die Team-Vorstellung und eine Live-Demo mit drei Handys über zwei Runden.
+`npm test` prüft die Leseengine, die Kalibrierung, die Bibliotheksregeln, die PDF-Layoutheuristiken, den EPUB-Import, die Artikelextraktion, die serverseitige Prüfung von Kalibrierungsläufen und die Regeln der Live-Demo (206 Tests). Durchgespielt im Browser wurden: Import von PDF, DOCX, TXT und Wikipedia-Artikel, Registrierung, Wechsel zu Pro mit Übernahme der Browser-Bibliothek, Upload und Download des Originals, Kalibrierung mit Speicherung und Auswertung, die Team-Vorstellung und eine Live-Demo mit drei Handys über zwei Runden.
 
 ## Bekannte Grenzen
 
-- **Keine Zahlung.** Pro wird per Klick aktiviert; Preise sind ein Entwurf.
-- **Kein OCR.** Gescannte PDFs ohne Textebene werden mit Hinweis abgelehnt.
+- **Keine Zahlung.** Pro wird per Klick aktiviert; die 7-tägige Testphase und die Preise zeigt nur `/preise`.
+- **Kein OCR.** Gescannte PDFs ohne Textebene werden mit Hinweis abgelehnt, Bilder (PNG) lassen sich nicht importieren.
 - **Mehrspaltige PDFs** folgen der Reihenfolge im PDF; Foveas Spaltenerkennung ist nicht übernommen.
 - **Keine Passwort-Zurücksetzung** und keine E-Mail-Bestätigung; dafür fehlt ein Mailversand.
 - **Fragen nur zu den Kalibrierungstexten.** KI-generierte Fragen zu eigenen Texten sind eine Ausbaustufe.

@@ -43,6 +43,8 @@
 	let result = $state.raw<CalibrationResult>();
 	let saved = $state.raw<StoredProfile | null>(null);
 	let previous = $state.raw<StoredProfile | null>(null);
+	/** The profile before this calibration, to show how far the speed moved. */
+	let before = $state.raw<StoredProfile | null>(null);
 	/** The reader's look; speed and chunking are fixed so every calibration is comparable. */
 	let appearance = $state.raw<Preferences>(DEFAULT_PREFERENCES);
 	let startedAt = new Date();
@@ -84,6 +86,7 @@
 
 	async function finish(finished: CalibrationResult) {
 		result = finished;
+		before = previous;
 		step = 'result';
 		saving = true;
 		try {
@@ -214,6 +217,19 @@
 				<div class="flex flex-col gap-2">
 					<p class="text-muted-foreground">Deine Verständnisgrenze</p>
 					<p class="font-heading text-5xl font-bold">{result.targetWpm} WPM</p>
+					{#if before}
+						{@const change = result.targetWpm - before.targetWpm}
+						<p class="font-medium text-primary">
+							{#if change > 0}
+								{change} WPM schneller als bei deiner letzten Kalibrierung
+							{:else if change < 0}
+								{-change} WPM langsamer als bei deiner letzten Kalibrierung
+							{:else}
+								Genauso schnell wie bei deiner letzten Kalibrierung
+							{/if}
+							({before.targetWpm} WPM)
+						</p>
+					{/if}
 					<p class="text-muted-foreground">
 						{percent(result.comprehension)} der Fragen bis zu diesem Tempo richtig beantwortet.
 						{#if result.targetWpm > limit}

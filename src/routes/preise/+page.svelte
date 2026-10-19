@@ -5,7 +5,7 @@
 	import * as Card from '#lib/components/ui/card/index.js';
 	import { Label } from '#lib/components/ui/label/index.js';
 	import { Slider } from '#lib/components/ui/slider/index.js';
-	import { FREE_MAXIMUM_WPM } from '#lib/plan.js';
+	import { FREE_LIBRARY_SIZE, FREE_MAXIMUM_WPM } from '#lib/plan.js';
 	import Check from 'phosphor-svelte/lib/Check';
 
 	const user = $derived(page.data.user);
@@ -28,31 +28,36 @@
 	const tiers = [
 		{
 			name: 'Free',
+			audience: 'Für alle, die gelegentlich lesen',
 			price: '0 €',
 			features: [
-				'Text einfügen, TXT-Dateien und Webartikel',
+				'Text einfügen, TXT, PDF und Webartikel',
 				`Bis ${FREE_MAXIMUM_WPM} Wörter pro Minute`,
-				'Kalibrierung per Quiz',
-				'Bibliothek in diesem Browser'
+				'Kalibrierung per Quiz, mit deiner Verbesserung',
+				`Bis zu ${FREE_LIBRARY_SIZE} Texte in der Bibliothek dieses Browsers`
 			]
 		},
 		{
 			name: 'Pro',
-			price: '4–6 € / Monat',
-			note: 'Studierendenrabatt',
+			audience: 'Für Studierende, Forschende, Juristinnen und Juristen',
+			price: '3,99 € / Monat',
+			note: 'oder 29,99 € im Jahr · 7 Tage kostenlos testen · Studierendenrabatt',
 			features: [
 				'Alles aus Free',
-				'PDF- und Word-Dateien, Originale im Konto',
+				'Word-Dokumente und E-Books, Originale im Konto',
 				'Unbegrenzte Geschwindigkeit',
-				'Bibliothek und Fortschritt auf allen Geräten',
-				'Auswertung aller Quizantworten'
+				'Unbegrenzte Bibliothek mit Fortschritt auf allen Geräten',
+				'Auswertung, Verlauf und Fortschrittskurve aller Quizantworten',
+				'Alle Schriften und Farben'
 			]
 		},
 		{
 			name: 'Business/Edu',
-			price: 'Auf Anfrage',
+			audience: 'Für Hochschulen, Kanzleien und Bildungseinrichtungen',
+			price: 'Je Person',
+			note: 'mit Mengenrabatt',
 			features: [
-				'Lizenzen für Hochschulen und Kanzleien',
+				'Lizenzen für ganze Teams und Jahrgänge',
 				'Alles aus Pro für jedes Mitglied',
 				'Gemeinsame Einführung und Live-Kalibrierung'
 			]
@@ -71,7 +76,7 @@
 		<h1 class="font-heading text-3xl font-bold">Preise</h1>
 		<p class="text-muted-foreground">
 			Lector verkauft keine maximale, sondern eine gemessene Geschwindigkeit. Kostenlos lesen, mit
-			Pro die volle Geschwindigkeit nutzen, die dein Verständnis trägt. Die Preise sind ein Entwurf.
+			Pro die volle Geschwindigkeit nutzen, die dein Verständnis trägt.
 		</p>
 	</div>
 
@@ -80,9 +85,10 @@
 			<Card.Root class={tier.name === 'Pro' ? 'border-primary ring-1 ring-primary' : ''}>
 				<Card.Header>
 					<Card.Title class="font-heading text-xl">{tier.name}</Card.Title>
-					<Card.Description>
+					<Card.Description class="flex flex-col gap-1">
+						<span>{tier.audience}</span>
 						<span class="text-2xl font-semibold text-foreground">{tier.price}</span>
-						{#if tier.note}<span class="block">{tier.note}</span>{/if}
+						{#if tier.note}<span>{tier.note}</span>{/if}
 					</Card.Description>
 				</Card.Header>
 				<Card.Content class="flex-1">

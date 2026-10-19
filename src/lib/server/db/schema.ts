@@ -108,7 +108,7 @@ export const document = sqliteTable(
 			.notNull()
 			.references(() => user.id, { onDelete: 'cascade' }),
 		title: text('title').notNull(),
-		format: text('format', { enum: ['pdf', 'docx', 'txt', 'url', 'text'] }).notNull(),
+		format: text('format', { enum: ['pdf', 'docx', 'epub', 'txt', 'url', 'text'] }).notNull(),
 		/** Original file name; null for URL imports and pasted text. */
 		fileName: text('file_name'),
 		sourceUrl: text('source_url'),

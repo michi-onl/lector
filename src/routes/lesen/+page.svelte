@@ -18,8 +18,8 @@
 		importFile,
 		MAX_FILE_BYTES
 	} from '#lib/import/index.js';
-	import { libraryFor, type NewDocument } from '#lib/library/index.js';
-	import { allowsFormat, planOf, syncs } from '#lib/plan.js';
+	import { libraryFor, LibraryFullError, type NewDocument } from '#lib/library/index.js';
+	import { allowsFormat, librarySize, planOf, syncs } from '#lib/plan.js';
 	import { textBlocks } from '#lib/reader/index.js';
 	import FileArrowUp from 'phosphor-svelte/lib/FileArrowUp';
 	import Globe from 'phosphor-svelte/lib/Globe';
@@ -40,13 +40,22 @@
 	let busy = $state<string | null>(null);
 	let failure = $state<string | null>(null);
 	let dragging = $state(false);
-	/** The failure is a Pro format; the message then links to the tariffs. */
+	/** The failure is a limit of Free; the message then links to the tariffs. */
 	let upgrade = $state(false);
+	/** Texts in the library, if the tariff limits them; null while unknown. */
+	let stored = $state<number | null>(null);
 
 	const plan = $derived(planOf(page.data.user));
+	const size = $derived(librarySize(plan));
+	const full = $derived(stored !== null && stored >= size);
 
 	onMount(() => {
 		void loadProfileFor(plan).then((loaded) => (profile = loaded));
+		if (Number.isFinite(size))
+			void libraryFor(plan)
+				.list()
+				.then((items) => (stored = items.length))
+				.catch(() => {});
 	});
 
 	const empty = $derived(!text.trim());
@@ -63,12 +72,15 @@
 			await goto(`/lesen/${entry.id}`);
 		} catch (error) {
 			console.error(error);
+			if (error instanceof LibraryFullError) upgrade = true;
 			failure =
 				error instanceof ImportError
 					? error.message
-					: syncs(plan)
-						? 'Der Text ließ sich nicht in deinem Konto speichern. Bist du noch angemeldet?'
-						: 'Der Text ließ sich nicht in der Bibliothek speichern. Erlaubt der Browser das Speichern von Daten für diese Seite?';
+					: error instanceof LibraryFullError
+						? `${error.message} Lösche einen Text in der Bibliothek, um einen neuen zu lesen.`
+						: syncs(plan)
+							? 'Der Text ließ sich nicht in deinem Konto speichern. Bist du noch angemeldet?'
+							: 'Der Text ließ sich nicht in der Bibliothek speichern. Erlaubt der Browser das Speichern von Daten für diese Seite?';
 		} finally {
 			busy = null;
 		}
@@ -85,7 +97,7 @@
 			const format = await fileFormat(file);
 			if (!allowsFormat(plan, format)) {
 				upgrade = true;
-				throw new ImportError('PDF- und Word-Dateien liest Lector Pro.');
+				throw new ImportError('Word-Dokumente und E-Books liest Lector Pro.');
 			}
 			busy = `„${file.name}“ wird gelesen …`;
 			return importFile(file, (page, pages) => {
@@ -146,6 +158,20 @@
 		</p>
 	</div>
 
+	{#if full}
+		<Alert.Root>
+			<WarningCircle />
+			<Alert.Title>Deine Bibliothek ist voll.</Alert.Title>
+			<Alert.Description>
+				<p>
+					Lector Free hebt bis zu {size} Texte auf. Lösche einen in der
+					<a href="/bibliothek" class="underline underline-offset-4">Bibliothek</a>, oder lies mit
+					<a href="/preise" class="underline underline-offset-4">Lector Pro</a> ohne Grenze.
+				</p>
+			</Alert.Description>
+		</Alert.Root>
+	{/if}
+
 	<Tabs.Root value="text" class="gap-6">
 		<Tabs.List class="w-full sm:w-fit">
 			<Tabs.Trigger value="text">Text einfügen</Tabs.Trigger>
@@ -182,10 +208,10 @@
 				<span class="font-medium">Datei auswählen oder hierher ziehen</span>
 				<span class="text-sm text-muted-foreground">
 					{#if plan === 'pro'}
-						PDF, Word (DOCX) oder TXT, bis {MAX_FILE_BYTES / 1024 / 1024} MB. Der Text wird in deinem
-						Browser ausgelesen, das Original in deinem Konto gespeichert.
+						PDF, Word (DOCX), E-Book (EPUB) oder TXT, bis {MAX_FILE_BYTES / 1024 / 1024} MB. Der Text
+						wird in deinem Browser ausgelesen, das Original in deinem Konto gespeichert.
 					{:else}
-						TXT, bis {MAX_FILE_BYTES / 1024 / 1024} MB. PDF und Word (DOCX) liest
+						PDF oder TXT, bis {MAX_FILE_BYTES / 1024 / 1024} MB. Word (DOCX) und E-Books (EPUB) liest
 						<a href="/preise" class="underline underline-offset-4">Lector Pro</a>.
 					{/if}
 				</span>
@@ -230,9 +256,7 @@
 				<Alert.Description>
 					{failure}
 					{#if upgrade}
-						<a href="/preise" class="underline underline-offset-4">
-							Text und Webartikel sind kostenlos; mehr zu Pro.
-						</a>
+						<a href="/preise" class="underline underline-offset-4">Mehr zu Lector Pro.</a>
 					{/if}
 				</Alert.Description>
 			</Alert.Root>

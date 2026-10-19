@@ -9,7 +9,7 @@
 		progressShare,
 		type LibraryEntry
 	} from '#lib/library/index.js';
-	import { syncs } from '#lib/plan.js';
+	import { librarySize, syncs } from '#lib/plan.js';
 	import DownloadSimple from 'phosphor-svelte/lib/DownloadSimple';
 	import Plus from 'phosphor-svelte/lib/Plus';
 	import Trash from 'phosphor-svelte/lib/Trash';
@@ -22,6 +22,7 @@
 	let confirming = $state<string | null>(null);
 	const wpm = $derived(data.wpm);
 	const synced = $derived(syncs(data.plan));
+	const size = $derived(librarySize(data.plan));
 	const numbers = new Intl.NumberFormat('de-DE');
 	const dates = new Intl.DateTimeFormat('de-DE', { day: 'numeric', month: 'long' });
 
@@ -51,9 +52,9 @@
 				{#if synced}
 					Deine Bibliothek liegt in deinem Konto, mit Fortschritt auf allen Geräten.
 				{:else}
-					Die Bibliothek liegt nur in diesem Browser. Mit
-					<a href="/preise" class="underline underline-offset-4">Lector Pro</a> ist sie auf allen Geräten
-					dabei.
+					{items.length} von {size} Texten. Die Bibliothek liegt nur in diesem Browser. Mit
+					<a href="/preise" class="underline underline-offset-4">Lector Pro</a> ist sie unbegrenzt und
+					auf allen Geräten dabei.
 				{/if}
 			</p>
 		</div>

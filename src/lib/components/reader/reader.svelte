@@ -9,6 +9,7 @@
 	import type { ReadingUpdate } from '#lib/library/library.js';
 	import {
 		BACKGROUNDS,
+		DEFAULT_PREFERENCES,
 		FONT_SIZE,
 		FONTS,
 		type Preferences,
@@ -32,6 +33,7 @@
 		locked = false,
 		start = 0,
 		maximumWpm = MAXIMUM_WPM,
+		styles = true,
 		oncomplete,
 		onprogress
 	}: {
@@ -43,6 +45,8 @@
 		start?: number;
 		/** The tariff's limit for the speed slider. */
 		maximumWpm?: number;
+		/** Whether the tariff offers every font and background, or only the default ones. */
+		styles?: boolean;
 		oncomplete?: () => void;
 		/** Called whenever the position changes or reading time passes. */
 		onprogress?: (update: ReadingUpdate) => void;
@@ -176,7 +180,13 @@
 					aria-label="Schriftart"
 				>
 					{#each Object.entries(FONTS) as [value, font] (value)}
-						<ToggleGroup.Item {value} class={font.class}>{font.label}</ToggleGroup.Item>
+						<ToggleGroup.Item
+							{value}
+							class={font.class}
+							disabled={!styles && value !== DEFAULT_PREFERENCES.font}
+						>
+							{font.label}
+						</ToggleGroup.Item>
 					{/each}
 				</ToggleGroup.Root>
 				<ToggleGroup.Root
@@ -187,7 +197,11 @@
 					aria-label="Hintergrund"
 				>
 					{#each Object.entries(BACKGROUNDS) as [value, colors] (value)}
-						<ToggleGroup.Item {value} class="gap-2">
+						<ToggleGroup.Item
+							{value}
+							class="gap-2"
+							disabled={!styles && value !== DEFAULT_PREFERENCES.background}
+						>
 							<span
 								class="size-3.5 rounded-full border"
 								style:background-color={colors.background}
@@ -210,6 +224,12 @@
 					<span class="w-14 shrink-0 text-right text-sm tabular-nums">{settings.fontSize} px</span>
 				</div>
 			</div>
+			{#if !styles}
+				<p class="text-sm text-muted-foreground">
+					Weitere Schriften und Farben gibt es mit
+					<a href="/preise" class="underline underline-offset-4">Lector Pro</a>.
+				</p>
+			{/if}
 		</section>
 	{/if}
 

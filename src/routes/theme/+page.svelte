@@ -432,7 +432,7 @@
 					class="flex flex-col items-center gap-2 rounded-lg border border-dashed p-6 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
 				>
 					<UploadSimple class="size-6" />
-					PDF, DOCX oder TXT hierher ziehen
+					PDF, DOCX, EPUB oder TXT hierher ziehen
 				</button>
 				<div class="flex flex-wrap gap-2">
 					<Badge>Pro</Badge>

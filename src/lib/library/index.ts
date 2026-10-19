@@ -1,4 +1,4 @@
-import { syncs, type Plan } from '#lib/plan.js';
+import { librarySize, syncs, type Plan } from '#lib/plan.js';
 import type { LibraryEntry, NewDocument, ReadingUpdate } from './library.js';
 import * as remote from './remote.js';
 import * as local from './store.js';
@@ -15,13 +15,13 @@ export interface Library {
 	remove(id: string): Promise<void>;
 }
 
-const browserLibrary: Library = {
+const browserLibrary = (size: number): Library => ({
 	list: local.listLibrary,
-	add: local.addDocument,
+	add: (document) => local.addDocument(document, size),
 	open: (id) => local.openDocument(id),
 	record: local.recordProgress,
 	remove: local.removeDocument
-};
+});
 
 const accountLibrary: Library = {
 	list: remote.listLibrary,
@@ -32,7 +32,7 @@ const accountLibrary: Library = {
 };
 
 export function libraryFor(plan: Plan): Library {
-	return syncs(plan) ? accountLibrary : browserLibrary;
+	return syncs(plan) ? accountLibrary : browserLibrary(librarySize(plan));
 }
 
 /**
