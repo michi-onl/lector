@@ -59,7 +59,7 @@
 		'border border-white/60 bg-background/70 shadow-[0_8px_32px_rgb(0_0_0/0.14)] backdrop-blur-xl backdrop-saturate-150 dark:border-white/10 dark:bg-background/60 [@media(prefers-reduced-transparency:reduce)]:bg-background';
 </script>
 
-<header class="bg-primary text-primary-foreground">
+<header class="sticky top-0 z-40 bg-primary text-primary-foreground">
 	<div class="mx-auto flex h-16 max-w-5xl items-center gap-8 px-6">
 		<a href="/" aria-label="Lector, zur Startseite">
 			<!-- The burgundy „o“ would vanish on the bar, so it turns pale rose here. -->

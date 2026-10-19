@@ -145,7 +145,8 @@
 		</Card.Root>
 	{/if}
 
-	<section id="auswertung" class="flex scroll-mt-6 flex-col gap-4">
+	<!-- Clears the sticky header (5rem) when /konto#auswertung jumps here. -->
+	<section id="auswertung" class="flex scroll-mt-26 flex-col gap-4">
 		<h2 class="font-heading text-2xl font-bold">Auswertung</h2>
 		{#if !data.evaluation}
 			<p class="text-muted-foreground">
