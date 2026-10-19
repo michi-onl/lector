@@ -1,6 +1,7 @@
 <script lang="ts">
 	import Logo from '#lib/components/logo.svelte';
 	import RsvpDemo from '#lib/components/reader/rsvp-demo.svelte';
+	import SiteFooter from '#lib/components/site-footer.svelte';
 	import SiteHeader from '#lib/components/site-header.svelte';
 	import { Button } from '#lib/components/ui/button/index.js';
 	import { FREE_MAXIMUM_WPM } from '#lib/plan.js';
@@ -107,10 +108,6 @@
 		</p>
 		<Button href="/preise" variant="secondary">Preise ansehen</Button>
 	</section>
-
-	<footer class="flex flex-wrap gap-x-6 gap-y-2 text-sm text-muted-foreground">
-		<span>Für die Präsentation:</span>
-		<a href="/praesentation" class="underline underline-offset-4">Team-Intro per RSVP</a>
-		<a href="/live" class="underline underline-offset-4">Live-Demo mit Publikum</a>
-	</footer>
 </main>
+
+<SiteFooter />

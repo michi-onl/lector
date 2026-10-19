@@ -127,9 +127,9 @@
 </nav>
 
 <style>
-	/* Keeps the end of the page clear of the floating tab bar. */
+	/* Keeps the end of the page clear of the floating tab bar; a footer makes room itself. */
 	@media (width < 40rem) {
-		:global(body:has(#tab-bar)) {
+		:global(body:has(#tab-bar):not(:has(#site-footer))) {
 			padding-bottom: calc(5.5rem + env(safe-area-inset-bottom));
 		}
 	}

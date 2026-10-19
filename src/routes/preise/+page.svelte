@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/state';
+	import SiteFooter from '#lib/components/site-footer.svelte';
 	import SiteHeader from '#lib/components/site-header.svelte';
 	import { Button } from '#lib/components/ui/button/index.js';
 	import * as Card from '#lib/components/ui/card/index.js';
@@ -153,3 +154,5 @@
 		</div>
 	</section>
 </main>
+
+<SiteFooter />
