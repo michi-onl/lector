@@ -82,6 +82,14 @@
 			<Button type="submit" disabled={pending}>
 				{mode === 'sign-in' ? 'Anmelden' : 'Konto anlegen'}
 			</Button>
+			{#if mode === 'sign-up'}
+				<p class="text-xs text-muted-foreground">
+					Was mit deinen Daten geschieht, steht in der <a
+						href="/datenschutz"
+						class="underline underline-offset-4">Datenschutzerklärung</a
+					>.
+				</p>
+			{/if}
 		</form>
 	</Card.Content>
 	<Card.Footer class="text-sm text-muted-foreground">

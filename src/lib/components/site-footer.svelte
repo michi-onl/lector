@@ -59,9 +59,17 @@
 				{/each}
 			</nav>
 		</div>
-		<p class="border-t border-primary-foreground/15 pt-6 text-sm text-primary-foreground/60">
-			© {new Date().getFullYear()} Lector · Robin, Timo, Magnus und Michi
-		</p>
+		<div
+			class="flex flex-col gap-3 border-t border-primary-foreground/15 pt-6 text-sm text-primary-foreground/60 sm:flex-row sm:justify-between"
+		>
+			<p>© {new Date().getFullYear()} Lector · Robin, Timo, Magnus und Michi</p>
+			<div class="flex gap-6">
+				<a href="/impressum" class="transition-colors hover:text-primary-foreground">Impressum</a>
+				<a href="/datenschutz" class="transition-colors hover:text-primary-foreground"
+					>Datenschutz</a
+				>
+			</div>
+		</div>
 	</div>
 </footer>
 

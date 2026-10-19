@@ -4,20 +4,21 @@ Stand: 19. Oktober 2026. Dieses Dokument beschreibt, was der Prototyp kann, wie 
 
 ## Funktionen und Seiten
 
-| Seite                        | Inhalt                                                                                                      |
-| ---------------------------- | ----------------------------------------------------------------------------------------------------------- |
-| `/`                          | Startseite: Wertversprechen, RSVP-Demo mit steigendem Tempo, Funktionen, Antworten auf die Forschungskritik |
-| `/bibliothek`                | Gespeicherte Texte mit Lesefortschritt und Restzeit, für Free bis zu 3, für Pro mit Download des Originals  |
-| `/bibliothek/neu`            | Neuer Text: einfügen, Datei hochladen (PDF, DOCX, EPUB, TXT) oder Webartikel per URL importieren            |
-| `/lesen/[id]`                | Reader mit ORP, adaptivem Tempo, Satz-Rewind, Chunk-Modus, optischer Anpassung und Volltext                 |
-| `/kalibrierung`              | Quiz-Kalibrierung: bis zu sechs Texte von 200 bis 700 WPM, Verständnisgrenze und Veränderung zur letzten    |
-| `/preise`                    | Tarife Free, Pro, Business/Edu und Rechner für gesparte Lesestunden                                         |
-| `/registrieren`, `/anmelden` | Konto mit E-Mail und Passwort                                                                               |
-| `/konto`                     | Tarif wechseln, Browser-Daten ins Konto übernehmen, Auswertung aller Quizantworten (Pro)                    |
-| `/praesentation`             | Erste Folie: Das Team stellt sich per RSVP vor, mit 300, 500 und 700 WPM                                    |
-| `/live`                      | Live-Demo anlegen oder per Code beitreten                                                                   |
-| `/live/[code]`               | Handyansicht für das Publikum: Fragen beantworten, eigenes Ergebnis sehen                                   |
-| `/live/[code]/leitung`       | Beameransicht: QR-Code, Text im Tempo der Runde, eingehende Antworten, Ergebnisse, Speed-up-Kurve           |
+| Seite                        | Inhalt                                                                                                        |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| `/`                          | Startseite: Wertversprechen, RSVP-Demo mit steigendem Tempo, Funktionen, Antworten auf die Forschungskritik   |
+| `/bibliothek`                | Gespeicherte Texte mit Lesefortschritt und Restzeit, für Free bis zu 3, für Pro mit Download des Originals    |
+| `/bibliothek/neu`            | Neuer Text: einfügen, Datei hochladen (PDF, DOCX, EPUB, TXT) oder Webartikel per URL importieren              |
+| `/lesen/[id]`                | Reader mit ORP, adaptivem Tempo, Satz-Rewind, Chunk-Modus, optischer Anpassung und Volltext                   |
+| `/kalibrierung`              | Quiz-Kalibrierung: bis zu sechs Texte von 200 bis 700 WPM, Verständnisgrenze und Veränderung zur letzten      |
+| `/preise`                    | Tarife Free, Pro, Business/Edu und Rechner für gesparte Lesestunden                                           |
+| `/impressum`, `/datenschutz` | Pflichtangaben und Datenschutzerklärung, vorgerendert; die Angaben zum Betreiber stehen in `src/lib/legal.ts` |
+| `/registrieren`, `/anmelden` | Konto mit E-Mail und Passwort                                                                                 |
+| `/konto`                     | Tarif wechseln, Browser-Daten ins Konto übernehmen, Auswertung aller Quizantworten (Pro)                      |
+| `/praesentation`             | Erste Folie: Das Team stellt sich per RSVP vor, mit 300, 500 und 700 WPM                                      |
+| `/live`                      | Live-Demo anlegen oder per Code beitreten                                                                     |
+| `/live/[code]`               | Handyansicht für das Publikum: Fragen beantworten, eigenes Ergebnis sehen                                     |
+| `/live/[code]/leitung`       | Beameransicht: QR-Code, Text im Tempo der Runde, eingehende Antworten, Ergebnisse, Speed-up-Kurve             |
 
 ### Abgleich mit der Spezifikation
 
