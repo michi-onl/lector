@@ -12,8 +12,9 @@
 	<title>Konto anlegen · Lector</title>
 </svelte:head>
 
-<main class="mx-auto flex min-h-svh max-w-3xl flex-col gap-10 p-6">
-	<SiteHeader />
+<SiteHeader />
+
+<main class="mx-auto flex max-w-3xl flex-col gap-10 p-6">
 	<AuthForm mode="sign-up" {form}>
 		{#snippet footer()}
 			Schon ein Konto?&nbsp;

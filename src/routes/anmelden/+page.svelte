@@ -12,8 +12,9 @@
 	<title>Anmelden · Lector</title>
 </svelte:head>
 
-<main class="mx-auto flex min-h-svh max-w-3xl flex-col gap-10 p-6">
-	<SiteHeader />
+<SiteHeader />
+
+<main class="mx-auto flex max-w-3xl flex-col gap-10 p-6">
 	<AuthForm mode="sign-in" {form}>
 		{#snippet footer()}
 			Noch kein Konto?&nbsp;

@@ -5,7 +5,8 @@
 	let { children }: LayoutProps = $props();
 </script>
 
-<main class="mx-auto flex min-h-svh max-w-3xl flex-col gap-8 p-6">
-	<SiteHeader />
+<SiteHeader />
+
+<main class="mx-auto flex max-w-3xl flex-col gap-8 p-6">
 	{@render children()}
 </main>

@@ -24,9 +24,9 @@
 	<title>Live-Demo · Lector</title>
 </svelte:head>
 
-<main class="mx-auto flex min-h-svh max-w-3xl flex-col gap-8 p-6">
-	<SiteHeader />
+<SiteHeader />
 
+<main class="mx-auto flex max-w-3xl flex-col gap-8 p-6">
 	<div class="flex flex-col gap-1">
 		<h1 class="font-heading text-3xl font-bold">Live-Demo</h1>
 		<p class="text-muted-foreground">

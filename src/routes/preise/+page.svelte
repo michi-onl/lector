@@ -69,9 +69,9 @@
 	<title>Preise · Lector</title>
 </svelte:head>
 
-<main class="mx-auto flex min-h-svh max-w-5xl flex-col gap-10 p-6">
-	<SiteHeader />
+<SiteHeader />
 
+<main class="mx-auto flex max-w-5xl flex-col gap-10 p-6">
 	<div class="flex max-w-2xl flex-col gap-2">
 		<h1 class="font-heading text-3xl font-bold">Preise</h1>
 		<p class="text-muted-foreground">

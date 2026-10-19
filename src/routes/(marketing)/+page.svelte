@@ -50,9 +50,9 @@
 	/>
 </svelte:head>
 
-<main class="mx-auto flex min-h-svh max-w-5xl flex-col gap-20 p-6 pb-20">
-	<SiteHeader prerendered />
+<SiteHeader prerendered />
 
+<main class="mx-auto flex max-w-5xl flex-col gap-20 p-6 pb-20">
 	<section class="flex flex-col items-center gap-6 pt-8 text-center">
 		<h1 class="sr-only">Lector</h1>
 		<Logo class="text-6xl sm:text-7xl" />

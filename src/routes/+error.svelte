@@ -18,8 +18,9 @@
 	<title>Fehler {page.status} · Lector</title>
 </svelte:head>
 
-<main class="mx-auto flex min-h-svh max-w-3xl flex-col gap-8 p-6">
-	<SiteHeader />
+<SiteHeader />
+
+<main class="mx-auto flex max-w-3xl flex-col gap-8 p-6">
 	<section class="flex flex-col items-start gap-4">
 		<p class="text-sm text-muted-foreground">Fehler {page.status}</p>
 		<h1 class="font-heading text-3xl font-bold">{message}</h1>
