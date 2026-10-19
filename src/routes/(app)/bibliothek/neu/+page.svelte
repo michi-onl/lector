@@ -3,7 +3,6 @@
 	import { page } from '$app/state';
 	import type { StoredProfile } from '#lib/calibration/index.js';
 	import { loadProfileFor } from '#lib/calibration/store.js';
-	import SiteHeader from '#lib/components/site-header.svelte';
 	import * as Alert from '#lib/components/ui/alert/index.js';
 	import { Button } from '#lib/components/ui/button/index.js';
 	import { Input } from '#lib/components/ui/input/index.js';
@@ -139,127 +138,123 @@
 </script>
 
 <svelte:head>
-	<title>Lesen · Lector</title>
+	<title>Neuer Text · Lector</title>
 </svelte:head>
 
-<main class="mx-auto flex min-h-svh max-w-3xl flex-col gap-8 p-6">
-	<SiteHeader />
+<div class="flex flex-col gap-1">
+	<h1 class="font-heading text-3xl font-bold">Neuer Text</h1>
+	<p class="text-sm text-muted-foreground">
+		{#if profile}
+			Kalibriert auf {profile.targetWpm} WPM ·
+			<a href="/kalibrierung" class="underline underline-offset-4">neu kalibrieren</a>
+		{:else}
+			<a href="/kalibrierung" class="underline underline-offset-4">Tempo kalibrieren</a>
+			und mit dem Tempo lesen, das dein Verständnis trägt
+		{/if}
+	</p>
+</div>
 
-	<div class="flex flex-col gap-1">
-		<h1 class="font-heading text-3xl font-bold">Neuer Text</h1>
-		<p class="text-sm text-muted-foreground">
-			{#if profile}
-				Kalibriert auf {profile.targetWpm} WPM ·
-				<a href="/kalibrierung" class="underline underline-offset-4">neu kalibrieren</a>
-			{:else}
-				<a href="/kalibrierung" class="underline underline-offset-4">Tempo kalibrieren</a>
-				und mit dem Tempo lesen, das dein Verständnis trägt
-			{/if}
-		</p>
-	</div>
+{#if full}
+	<Alert.Root>
+		<WarningCircle />
+		<Alert.Title>Deine Bibliothek ist voll.</Alert.Title>
+		<Alert.Description>
+			<p>
+				Lector Free hebt bis zu {size} Texte auf. Lösche einen in der
+				<a href="/bibliothek" class="underline underline-offset-4">Bibliothek</a>, oder lies mit
+				<a href="/preise" class="underline underline-offset-4">Lector Pro</a> ohne Grenze.
+			</p>
+		</Alert.Description>
+	</Alert.Root>
+{/if}
 
-	{#if full}
-		<Alert.Root>
+<Tabs.Root value="text" class="gap-6">
+	<Tabs.List class="w-full sm:w-fit">
+		<Tabs.Trigger value="text">Text einfügen</Tabs.Trigger>
+		<Tabs.Trigger value="file">Datei</Tabs.Trigger>
+		<Tabs.Trigger value="url">Webartikel</Tabs.Trigger>
+	</Tabs.List>
+
+	<Tabs.Content value="text">
+		<form class="flex flex-col gap-4" onsubmit={readText}>
+			<Label for="text" class="sr-only">Text</Label>
+			<Textarea
+				id="text"
+				bind:value={text}
+				rows={12}
+				class="min-h-64 rounded-3xl px-4 md:text-base"
+				placeholder="Artikel, Skript oder Kapitel hier einfügen …"
+			/>
+			<Button type="submit" class="self-start" disabled={empty || !!busy}><Play />Lesen</Button>
+		</form>
+	</Tabs.Content>
+
+	<Tabs.Content value="file">
+		<label
+			class="flex cursor-pointer flex-col items-center gap-3 rounded-3xl border-2 border-dashed px-6 py-14 text-center transition-colors hover:bg-muted/60 data-[dragging=true]:border-primary data-[dragging=true]:bg-muted"
+			data-dragging={dragging}
+			ondragover={(event) => {
+				event.preventDefault();
+				dragging = true;
+			}}
+			ondragleave={() => (dragging = false)}
+			{ondrop}
+		>
+			<FileArrowUp class="size-10 text-primary" />
+			<span class="font-medium">Datei auswählen oder hierher ziehen</span>
+			<span class="text-sm text-muted-foreground">
+				{#if plan === 'pro'}
+					PDF, Word (DOCX), E-Book (EPUB) oder TXT, bis {MAX_FILE_BYTES / 1024 / 1024} MB. Der Text wird
+					in deinem Browser ausgelesen, das Original in deinem Konto gespeichert.
+				{:else}
+					PDF oder TXT, bis {MAX_FILE_BYTES / 1024 / 1024} MB. Word (DOCX) und E-Books (EPUB) liest
+					<a href="/preise" class="underline underline-offset-4">Lector Pro</a>.
+				{/if}
+			</span>
+			<input
+				type="file"
+				accept={ACCEPTED_FILES}
+				class="sr-only"
+				disabled={!!busy}
+				onchange={(event) => readFile(event.currentTarget.files?.[0])}
+			/>
+		</label>
+	</Tabs.Content>
+
+	<Tabs.Content value="url">
+		<form class="flex flex-col gap-4" onsubmit={readUrl}>
+			<Label for="url">Adresse des Artikels</Label>
+			<div class="flex flex-col gap-3 sm:flex-row">
+				<Input
+					id="url"
+					type="url"
+					bind:value={url}
+					required
+					placeholder="https://…"
+					autocomplete="url"
+				/>
+				<Button type="submit" disabled={!url.trim() || !!busy}><Globe />Artikel laden</Button>
+			</div>
+			<p class="text-sm text-muted-foreground">
+				Lector lädt die Seite und übernimmt nur den Artikeltext – ohne Navigation, Werbung und
+				Kommentare.
+			</p>
+		</form>
+	</Tabs.Content>
+</Tabs.Root>
+
+<div aria-live="polite">
+	{#if busy}
+		<p class="text-sm text-muted-foreground">{busy}</p>
+	{:else if failure}
+		<Alert.Root variant={upgrade ? 'default' : 'destructive'}>
 			<WarningCircle />
-			<Alert.Title>Deine Bibliothek ist voll.</Alert.Title>
 			<Alert.Description>
-				<p>
-					Lector Free hebt bis zu {size} Texte auf. Lösche einen in der
-					<a href="/bibliothek" class="underline underline-offset-4">Bibliothek</a>, oder lies mit
-					<a href="/preise" class="underline underline-offset-4">Lector Pro</a> ohne Grenze.
-				</p>
+				{failure}
+				{#if upgrade}
+					<a href="/preise" class="underline underline-offset-4">Mehr zu Lector Pro.</a>
+				{/if}
 			</Alert.Description>
 		</Alert.Root>
 	{/if}
-
-	<Tabs.Root value="text" class="gap-6">
-		<Tabs.List class="w-full sm:w-fit">
-			<Tabs.Trigger value="text">Text einfügen</Tabs.Trigger>
-			<Tabs.Trigger value="file">Datei</Tabs.Trigger>
-			<Tabs.Trigger value="url">Webartikel</Tabs.Trigger>
-		</Tabs.List>
-
-		<Tabs.Content value="text">
-			<form class="flex flex-col gap-4" onsubmit={readText}>
-				<Label for="text" class="sr-only">Text</Label>
-				<Textarea
-					id="text"
-					bind:value={text}
-					rows={12}
-					class="min-h-64 rounded-3xl px-4 md:text-base"
-					placeholder="Artikel, Skript oder Kapitel hier einfügen …"
-				/>
-				<Button type="submit" class="self-start" disabled={empty || !!busy}><Play />Lesen</Button>
-			</form>
-		</Tabs.Content>
-
-		<Tabs.Content value="file">
-			<label
-				class="flex cursor-pointer flex-col items-center gap-3 rounded-3xl border-2 border-dashed px-6 py-14 text-center transition-colors hover:bg-muted/60 data-[dragging=true]:border-primary data-[dragging=true]:bg-muted"
-				data-dragging={dragging}
-				ondragover={(event) => {
-					event.preventDefault();
-					dragging = true;
-				}}
-				ondragleave={() => (dragging = false)}
-				{ondrop}
-			>
-				<FileArrowUp class="size-10 text-primary" />
-				<span class="font-medium">Datei auswählen oder hierher ziehen</span>
-				<span class="text-sm text-muted-foreground">
-					{#if plan === 'pro'}
-						PDF, Word (DOCX), E-Book (EPUB) oder TXT, bis {MAX_FILE_BYTES / 1024 / 1024} MB. Der Text
-						wird in deinem Browser ausgelesen, das Original in deinem Konto gespeichert.
-					{:else}
-						PDF oder TXT, bis {MAX_FILE_BYTES / 1024 / 1024} MB. Word (DOCX) und E-Books (EPUB) liest
-						<a href="/preise" class="underline underline-offset-4">Lector Pro</a>.
-					{/if}
-				</span>
-				<input
-					type="file"
-					accept={ACCEPTED_FILES}
-					class="sr-only"
-					disabled={!!busy}
-					onchange={(event) => readFile(event.currentTarget.files?.[0])}
-				/>
-			</label>
-		</Tabs.Content>
-
-		<Tabs.Content value="url">
-			<form class="flex flex-col gap-4" onsubmit={readUrl}>
-				<Label for="url">Adresse des Artikels</Label>
-				<div class="flex flex-col gap-3 sm:flex-row">
-					<Input
-						id="url"
-						type="url"
-						bind:value={url}
-						required
-						placeholder="https://…"
-						autocomplete="url"
-					/>
-					<Button type="submit" disabled={!url.trim() || !!busy}><Globe />Artikel laden</Button>
-				</div>
-				<p class="text-sm text-muted-foreground">
-					Lector lädt die Seite und übernimmt nur den Artikeltext – ohne Navigation, Werbung und
-					Kommentare.
-				</p>
-			</form>
-		</Tabs.Content>
-	</Tabs.Root>
-
-	<div aria-live="polite">
-		{#if busy}
-			<p class="text-sm text-muted-foreground">{busy}</p>
-		{:else if failure}
-			<Alert.Root variant={upgrade ? 'default' : 'destructive'}>
-				<WarningCircle />
-				<Alert.Description>
-					{failure}
-					{#if upgrade}
-						<a href="/preise" class="underline underline-offset-4">Mehr zu Lector Pro.</a>
-					{/if}
-				</Alert.Description>
-			</Alert.Root>
-		{/if}
-	</div>
-</main>
+</div>

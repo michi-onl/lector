@@ -7,9 +7,9 @@ Stand: 19. Oktober 2026. Dieses Dokument beschreibt, was der Prototyp kann, wie 
 | Seite                        | Inhalt                                                                                                      |
 | ---------------------------- | ----------------------------------------------------------------------------------------------------------- |
 | `/`                          | Startseite: Wertversprechen, RSVP-Demo mit steigendem Tempo, Funktionen, Antworten auf die Forschungskritik |
-| `/lesen`                     | Neuer Text: einfügen, Datei hochladen (PDF, DOCX, EPUB, TXT) oder Webartikel per URL importieren            |
-| `/lesen/[id]`                | Reader mit ORP, adaptivem Tempo, Satz-Rewind, Chunk-Modus, optischer Anpassung und Volltext                 |
 | `/bibliothek`                | Gespeicherte Texte mit Lesefortschritt und Restzeit, für Free bis zu 3, für Pro mit Download des Originals  |
+| `/bibliothek/neu`            | Neuer Text: einfügen, Datei hochladen (PDF, DOCX, EPUB, TXT) oder Webartikel per URL importieren            |
+| `/lesen/[id]`                | Reader mit ORP, adaptivem Tempo, Satz-Rewind, Chunk-Modus, optischer Anpassung und Volltext                 |
 | `/kalibrierung`              | Quiz-Kalibrierung: bis zu sechs Texte von 200 bis 700 WPM, Verständnisgrenze und Veränderung zur letzten    |
 | `/preise`                    | Tarife Free, Pro, Business/Edu und Rechner für gesparte Lesestunden                                         |
 | `/registrieren`, `/anmelden` | Konto mit E-Mail und Passwort                                                                               |
@@ -51,7 +51,7 @@ Der Prototyp nimmt kein Geld. Ein Konto wechselt auf `/konto` mit einem Klick zw
 | Quiz            | Grenze und Veränderung zur letzten | dazu Kurve und Verlauf auf `/konto`      |
 | Darstellung     | Serif auf Creme, Schriftgröße frei | alle Schriften und Hintergründe          |
 
-Die Regeln stehen an einer Stelle, in `src/lib/plan.ts`. Ist die Bibliothek von Free voll, sagt `/lesen` das vor dem Import; ein Text, der schon in der Bibliothek liegt, öffnet trotzdem. Misst die Kalibrierung bei Free mehr als 300 WPM, zeigt der Reader das gemessene Tempo und verweist auf Pro. Das ist der Moment, in dem das Produkt seinen Wert selbst belegt.
+Die Regeln stehen an einer Stelle, in `src/lib/plan.ts`. Ist die Bibliothek von Free voll, sagt `/bibliothek/neu` das vor dem Import; ein Text, der schon in der Bibliothek liegt, öffnet trotzdem. Misst die Kalibrierung bei Free mehr als 300 WPM, zeigt der Reader das gemessene Tempo und verweist auf Pro. Das ist der Moment, in dem das Produkt seinen Wert selbst belegt.
 
 ## Architektur
 
@@ -79,6 +79,7 @@ flowchart LR
 ```
 
 - **Textextraktion im Browser.** Ein Worker hat 128 MB Arbeitsspeicher und wenig CPU-Zeit pro Anfrage; große PDFs dort zu parsen wäre riskant. Außerdem braucht Free so gar keinen Server. Nur Webartikel lädt der Worker, weil Browser fremde Seiten nicht laden dürfen (CORS).
+- **Zwei Bereiche.** Die Startseite in `src/routes/(marketing)` wird beim Build vorgerendert; sie kennt keine Sitzung und verlinkt deshalb zur Bibliothek statt aufs Konto. Bibliothek, Reader und Kalibrierung in `src/routes/(app)` rendern nur im Browser, weil Free Bibliothek, Einstellungen und Leseprofil in IndexedDB hält; das gemeinsame Layout bringt Kopfzeile und Navigation mit.
 - **Eine Bibliothek, zwei Speicherorte.** `libraryFor(plan)` in `src/lib/library/index.ts` liefert dieselbe Schnittstelle für IndexedDB und das Konto; Seiten unterscheiden die Tarife nicht.
 - **Leseengine ohne Framework.** `src/lib/reader/` ist reines TypeScript (aus Fovea portiert, mit Tests). Die Klasse `Player` treibt die Zustandsmaschine im Takt von `requestAnimationFrame`; Reader, Präsentation und Live-Demo nutzen sie gemeinsam.
 - **Server prüft, was Browser schicken.** Textblöcke, Lesefortschritt, Einstellungen, Leseprofil und Kalibrierungsläufe werden mit denselben Funktionen geprüft, die der Browser verwendet. Die Fragetiefe einer Kalibrierung nimmt der Server aus dem Text, nicht aus der Anfrage.

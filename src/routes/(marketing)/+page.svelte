@@ -51,7 +51,7 @@
 </svelte:head>
 
 <main class="mx-auto flex min-h-svh max-w-5xl flex-col gap-20 p-6 pb-20">
-	<SiteHeader />
+	<SiteHeader prerendered />
 
 	<section class="flex flex-col items-center gap-6 pt-8 text-center">
 		<h1 class="sr-only">Lector</h1>
@@ -65,7 +65,7 @@
 		</p>
 		<div class="flex flex-wrap justify-center gap-3">
 			<Button href="/kalibrierung"><Gauge />Tempo kalibrieren</Button>
-			<Button href="/lesen" variant="secondary"><Play />Text lesen</Button>
+			<Button href="/bibliothek/neu" variant="secondary"><Play />Text lesen</Button>
 		</div>
 		<RsvpDemo class="mt-4 max-w-2xl" />
 	</section>

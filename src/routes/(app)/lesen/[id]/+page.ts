@@ -5,9 +5,6 @@ import { loadPreferences } from '#lib/preferences/store.js';
 import { error } from '@sveltejs/kit';
 import type { PageLoad } from './$types';
 
-// The library of Free lives in IndexedDB, so the page only renders in the browser.
-export const ssr = false;
-
 export const load: PageLoad = async ({ params, parent }) => {
 	const plan = planOf((await parent()).user);
 	const [opened, preferences, profile] = await Promise.all([

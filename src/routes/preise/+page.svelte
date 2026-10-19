@@ -102,7 +102,7 @@
 				</Card.Content>
 				<Card.Footer>
 					{#if tier.name === 'Free'}
-						<Button variant="secondary" href="/lesen">Kostenlos lesen</Button>
+						<Button variant="secondary" href="/bibliothek/neu">Kostenlos lesen</Button>
 					{:else if tier.name === 'Pro'}
 						<Button href={user ? '/konto' : '/registrieren?weiter=/konto'}>
 							{user?.plan === 'pro' ? 'Dein Tarif' : 'Pro testen'}
