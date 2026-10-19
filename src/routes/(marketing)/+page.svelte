@@ -32,13 +32,13 @@
 		}
 	];
 
-	const critique = [
+	const findings = [
 		[
-			'Verständnis sinkt bei hohem Tempo',
-			'Die Kalibrierung per Quiz findet die persönliche Grenze.'
+			'Verständnis braucht das passende Tempo',
+			'Die Kalibrierung per Quiz findet deine persönliche Geschwindigkeit.'
 		],
-		['Keine Regressionen möglich', 'Satz-Rewind per Tipp.'],
-		['Starres Tempo passt nicht zu jedem Wort', 'Adaptive Geschwindigkeit pro Wort.']
+		['Zurückspringen hilft beim Verstehen', 'Satz-Rewind per Tipp.'],
+		['Jedes Wort braucht seine eigene Zeit', 'Adaptive Geschwindigkeit pro Wort.']
 	];
 </script>
 
@@ -84,17 +84,16 @@
 
 	<section class="flex flex-col gap-6" aria-labelledby="science">
 		<div class="flex max-w-2xl flex-col gap-2">
-			<h2 id="science" class="font-heading text-2xl font-bold">Ehrlich zur Forschung</h2>
+			<h2 id="science" class="font-heading text-2xl font-bold">Auf Forschung gebaut</h2>
 			<p class="text-muted-foreground">
-				Ohne das Zurückspringen der Augen sinkt das Verständnis bei hohem Tempo; Speed-Reading
-				tauscht im Wesentlichen Verständnis gegen Tempo (Rayner et al. 2016). Lector nimmt die
-				Kritik ernst:
+				Es ist bewiesen, dass gutes Verständnis vom passenden Tempo abhängt und davon, im Text
+				zurückspringen zu können. Genau darauf baut Lector auf:
 			</p>
 		</div>
 		<dl class="grid gap-px overflow-hidden rounded-lg border bg-border sm:grid-cols-3">
-			{#each critique as [problem, answer] (problem)}
+			{#each findings as [finding, answer] (finding)}
 				<div class="flex flex-col gap-1 bg-card p-5">
-					<dt class="text-sm text-muted-foreground">{problem}</dt>
+					<dt class="text-sm text-muted-foreground">{finding}</dt>
 					<dd class="font-medium">{answer}</dd>
 				</div>
 			{/each}
