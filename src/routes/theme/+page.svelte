@@ -25,16 +25,19 @@
 
 	let dark = $state(false);
 
-	// Start from the system setting; runs before the effect below.
+	// Start from the system setting that app.html applied; runs before the effect below.
 	onMount(() => {
-		dark =
-			document.documentElement.classList.contains('dark') ||
-			matchMedia('(prefers-color-scheme: dark)').matches;
+		dark = document.documentElement.classList.contains('dark');
 	});
 
+	// Hand back to the system setting when leaving the page.
 	$effect(() => {
 		document.documentElement.classList.toggle('dark', dark);
-		return () => document.documentElement.classList.remove('dark');
+		return () =>
+			document.documentElement.classList.toggle(
+				'dark',
+				matchMedia('(prefers-color-scheme: dark)').matches
+			);
 	});
 
 	// RSVP reader

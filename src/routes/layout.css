@@ -8,6 +8,7 @@
 
 :root {
 	/* Cream paper, burgundy ink */
+	color-scheme: light;
 	--background: oklch(0.973 0.014 84);
 	--foreground: oklch(0.235 0.025 25);
 	--card: oklch(0.987 0.008 84);
@@ -45,6 +46,7 @@
 
 .dark {
 	/* Dark oxblood, cream ink */
+	color-scheme: dark;
 	--background: oklch(0.185 0.018 25);
 	--foreground: oklch(0.945 0.015 84);
 	--card: oklch(0.225 0.022 22);

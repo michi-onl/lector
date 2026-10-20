@@ -155,4 +155,5 @@ Für den Einstieg `/praesentation` öffnen und mit **F** auf Vollbild schalten. 
 - **Mehrspaltige PDFs** folgen der Reihenfolge im PDF; Foveas Spaltenerkennung ist nicht übernommen.
 - **Keine Passwort-Zurücksetzung** und keine E-Mail-Bestätigung; dafür fehlt ein Mailversand.
 - **Fragen nur zu den Kalibrierungstexten.** KI-generierte Fragen zu eigenen Texten sind eine Ausbaustufe.
+- **Hell oder dunkel folgt dem System.** Eine eigene Wahl in den Einstellungen fehlt noch; der Reader-Hintergrund (Creme, Weiß, Sepia, Nacht) bleibt davon unabhängig.
 - **Konto löschen** ist nicht umgesetzt; D1 löscht abhängige Zeilen per Kaskade, R2-Objekte lägen unter `users/<id>/`.
