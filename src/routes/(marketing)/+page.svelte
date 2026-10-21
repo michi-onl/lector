@@ -55,21 +55,24 @@
 <SiteHeader prerendered />
 
 <main class="mx-auto flex max-w-5xl flex-col gap-20 p-6 pb-20">
-	<section class="flex flex-col items-center gap-6 pt-8 text-center">
-		<h1 class="sr-only">Lector</h1>
-		<Logo class="text-6xl sm:text-7xl" />
-		<p class="max-w-xl font-heading text-2xl text-balance sm:text-3xl">
-			Lesen soll nie der Engpass beim Lernen sein.
-		</p>
-		<p class="max-w-xl text-muted-foreground">
-			Lector zeigt deine Texte Wort für Wort, so schnell, wie du sie noch verstehst. In einem kurzen
-			Quiz findest du dieses Tempo heraus.
-		</p>
-		<div class="flex flex-wrap justify-center gap-3">
-			<Button href="/kalibrierung"><Gauge />Tempo kalibrieren</Button>
-			<Button href="/bibliothek/neu" variant="secondary"><Play />Text lesen</Button>
+	<section class="flex flex-col gap-10 pt-8">
+		<div class="flex flex-col items-start gap-6">
+			<h1 class="sr-only">Lector</h1>
+			<Logo class="text-6xl sm:text-7xl" />
+			<p class="max-w-2xl font-heading text-2xl text-balance sm:text-4xl sm:leading-tight">
+				Lesen soll nie der Engpass beim Lernen sein.
+			</p>
+			<p class="max-w-xl text-muted-foreground sm:text-lg">
+				Lector zeigt deine Texte Wort für Wort, so schnell, wie du sie noch verstehst. In einem
+				kurzen Quiz findest du dieses Tempo heraus.
+			</p>
+			<div class="flex flex-wrap gap-3">
+				<Button href="/kalibrierung"><Gauge />Tempo kalibrieren</Button>
+				<Button href="/bibliothek/neu" variant="secondary"><Play />Text lesen</Button>
+			</div>
 		</div>
-		<RsvpDemo class="mt-4 max-w-2xl" />
+		<!-- Full width: long words like „Verständniskontrolle“ need the room at 40 px. -->
+		<RsvpDemo />
 	</section>
 
 	<section class="grid gap-8 sm:grid-cols-2" aria-label="Funktionen">
@@ -99,14 +102,16 @@
 		</dl>
 	</section>
 
-	<section class="flex flex-col items-start gap-4 rounded-xl bg-muted p-8">
-		<h2 class="font-heading text-2xl font-bold">PDFs, Word-Dateien und Webartikel</h2>
-		<p class="max-w-2xl text-muted-foreground">
-			Kostenlos liest du eingefügten Text, PDFs und Webartikel mit bis zu {FREE_MAXIMUM_WPM} Wörtern pro
-			Minute. Mit Pro kommen Word und E-Books, unbegrenztes Tempo, eine Bibliothek auf allen Geräten und
-			die Auswertung deiner Quizantworten dazu.
-		</p>
-		<Button href="/preise" variant="secondary">Preise ansehen</Button>
+	<section class="grid gap-6 rounded-xl bg-muted p-8 md:grid-cols-[1fr_auto] md:items-end">
+		<div class="flex flex-col gap-4">
+			<h2 class="font-heading text-2xl font-bold">PDFs, Word-Dateien und Webartikel</h2>
+			<p class="max-w-2xl text-muted-foreground">
+				Kostenlos liest du eingefügten Text, PDFs und Webartikel mit bis zu {FREE_MAXIMUM_WPM} Wörtern
+				pro Minute. Mit Pro kommen Word und E-Books, unbegrenztes Tempo, eine Bibliothek auf allen Geräten
+				und die Auswertung deiner Quizantworten dazu.
+			</p>
+		</div>
+		<Button href="/preise" class="justify-self-start">Preise ansehen</Button>
 	</section>
 </main>
 
