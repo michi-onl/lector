@@ -1,4 +1,5 @@
 import { Readability } from '@mozilla/readability';
+import { error } from '@sveltejs/kit';
 import { parseHTML } from 'linkedom';
 
 /**
@@ -66,4 +67,51 @@ export function decodeHtml(bytes: Uint8Array, contentType: string | null): strin
 	} catch {
 		return new TextDecoder().decode(bytes);
 	}
+}
+
+const MAX_REDIRECTS = 5;
+const TIMEOUT_MS = 10_000;
+
+/**
+ * Whether the Worker may fetch this address: a named public host on the default port, without
+ * credentials. `URL` normalizes every spelling of an IP address, so all of them are caught here.
+ */
+export function isPublicUrl(url: URL): boolean {
+	if (url.protocol !== 'http:' && url.protocol !== 'https:') return false;
+	if (url.username || url.password || url.port) return false;
+	const host = url.hostname.toLowerCase().replace(/\.$/u, '');
+	if (host.startsWith('[') || /^[\d.]+$/u.test(host)) return false;
+	return host.includes('.') && !/\.(localhost|local|internal|intranet|lan|home|corp)$/u.test(host);
+}
+
+/** Fetches a page, checking the address of every redirect before following it. */
+export async function fetchPublicPage(start: URL): Promise<{ response: Response; url: URL }> {
+	const signal = AbortSignal.timeout(TIMEOUT_MS);
+	let url = start;
+	for (let hop = 0; hop <= MAX_REDIRECTS; hop++) {
+		if (!isPublicUrl(url)) error(400, 'Lector lädt nur öffentliche Webseiten.');
+		let response: Response;
+		try {
+			response = await fetch(url, {
+				headers: {
+					accept: 'text/html,application/xhtml+xml',
+					'accept-language': 'de,en;q=0.8',
+					'user-agent': 'Mozilla/5.0 (compatible; Lector/0.1; Leseliste)'
+				},
+				redirect: 'manual',
+				signal
+			});
+		} catch {
+			error(502, 'Die Seite ist nicht erreichbar.');
+		}
+		const location = response.headers.get('location');
+		if (response.status < 300 || response.status >= 400 || !location) return { response, url };
+		await response.body?.cancel();
+		try {
+			url = new URL(location, url);
+		} catch {
+			error(502, 'Die Seite leitet an eine ungültige Adresse weiter.');
+		}
+	}
+	error(502, 'Die Seite leitet zu oft weiter.');
 }

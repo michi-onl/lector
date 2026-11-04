@@ -1,5 +1,5 @@
-import { describe, expect, it } from 'vitest';
-import { decodeHtml, extractArticle } from './article.js';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import { decodeHtml, extractArticle, fetchPublicPage, isPublicUrl } from './article.js';
 
 const filler = Array.from(
 	{ length: 6 },
@@ -52,5 +52,92 @@ describe('decodeHtml', () => {
 			0x72
 		]);
 		expect(decodeHtml(bytes, 'text/html')).toContain('über');
+	});
+});
+
+describe('isPublicUrl', () => {
+	it.each([
+		'https://zeitung.example/artikel',
+		'http://www.tagesschau.de/',
+		'https://de.wikipedia.org:443/wiki/Lesen'
+	])('allows %s', (url) => {
+		expect(isPublicUrl(new URL(url))).toBe(true);
+	});
+
+	it.each([
+		'http://localhost/',
+		'http://LOCALHOST./',
+		'http://intranet/',
+		'http://drucker.local/',
+		'http://db.internal/',
+		'http://127.0.0.1/',
+		'http://2130706433/',
+		'http://0x7f.0.0.1/',
+		'http://10.0.0.1/',
+		'http://169.254.169.254/latest/meta-data/',
+		'http://8.8.8.8/',
+		'http://[::1]/',
+		'http://[::ffff:127.0.0.1]/',
+		'http://zeitung.example:8080/',
+		'http://nutzer:passwort@zeitung.example/',
+		'ftp://zeitung.example/',
+		'file:///etc/passwd'
+	])('rejects %s', (url) => {
+		expect(isPublicUrl(new URL(url))).toBe(false);
+	});
+});
+
+describe('fetchPublicPage', () => {
+	afterEach(() => {
+		vi.unstubAllGlobals();
+	});
+
+	const redirect = (location: string) => new Response(null, { status: 302, headers: { location } });
+
+	it('never contacts a private address the first request names', async () => {
+		const fetcher = vi.fn();
+		vi.stubGlobal('fetch', fetcher);
+		await expect(fetchPublicPage(new URL('http://127.0.0.1/'))).rejects.toMatchObject({
+			status: 400
+		});
+		expect(fetcher).not.toHaveBeenCalled();
+	});
+
+	it('follows redirects between public pages and reports the final address', async () => {
+		const fetcher = vi
+			.fn()
+			.mockResolvedValueOnce(redirect('/neu'))
+			.mockResolvedValueOnce(new Response('<html></html>'));
+		vi.stubGlobal('fetch', fetcher);
+		const { response, url } = await fetchPublicPage(new URL('https://zeitung.example/alt'));
+		expect(response.status).toBe(200);
+		expect(url.href).toBe('https://zeitung.example/neu');
+		expect(fetcher.mock.calls[0][1].redirect).toBe('manual');
+	});
+
+	it('stops at a redirect to a private address', async () => {
+		const fetcher = vi.fn().mockResolvedValueOnce(redirect('http://169.254.169.254/'));
+		vi.stubGlobal('fetch', fetcher);
+		await expect(fetchPublicPage(new URL('https://zeitung.example/'))).rejects.toMatchObject({
+			status: 400
+		});
+		expect(fetcher).toHaveBeenCalledTimes(1);
+	});
+
+	it('gives up on redirect loops', async () => {
+		vi.stubGlobal(
+			'fetch',
+			vi.fn(async () => redirect('https://zeitung.example/'))
+		);
+		await expect(fetchPublicPage(new URL('https://zeitung.example/'))).rejects.toMatchObject({
+			status: 502
+		});
+	});
+
+	it('reports an unreachable page', async () => {
+		vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new Error('offline')));
+		await expect(fetchPublicPage(new URL('https://zeitung.example/'))).rejects.toMatchObject({
+			status: 502
+		});
 	});
 });

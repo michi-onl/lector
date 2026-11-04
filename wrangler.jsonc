@@ -23,6 +23,14 @@
 			"jurisdiction": "eu"
 		}
 	],
+	// Per IP and Cloudflare location, not exact: it stops bulk abuse, not single requests.
+	"ratelimits": [
+		{
+			"name": "URL_IMPORT_LIMIT",
+			"namespace_id": "1001",
+			"simple": { "limit": 20, "period": 60 }
+		}
+	],
 	"secrets": {
 		"required": ["BETTER_AUTH_SECRET"]
 	},
