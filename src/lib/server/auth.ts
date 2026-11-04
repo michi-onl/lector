@@ -5,6 +5,7 @@ import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { sveltekitCookies } from 'better-auth/svelte-kit';
 import { env } from 'cloudflare:workers';
 import { getDb, schema } from './db/index.js';
+import { deleteUserObjects } from './storage.js';
 
 /** The origin differs between localhost, workers.dev and preview URLs, so it comes per request. */
 export function createAuth(baseURL: string) {
@@ -13,7 +14,15 @@ export function createAuth(baseURL: string) {
 		secret: env.BETTER_AUTH_SECRET,
 		database: drizzleAdapter(getDb(env.DB), { provider: 'sqlite', schema }),
 		emailAndPassword: { enabled: true },
+		// Without a password, Better Auth's own route deletes on a fresh session. Deleting goes
+		// through the account page instead, which always asks for the password.
+		disabledPaths: ['/delete-user'],
 		user: {
+			deleteUser: {
+				enabled: true,
+				// D1 removes the account's rows by cascade; that does not reach R2.
+				beforeDelete: (user) => deleteUserObjects(env.DOCUMENTS, user.id)
+			},
 			additionalFields: {
 				// Changed only by Lector itself (account page), never by sign-up input.
 				plan: { type: 'string', required: false, defaultValue: 'free', input: false }
@@ -30,6 +39,7 @@ export type AuthSession = Auth['$Infer']['Session'];
 const AUTH_MESSAGES: Record<string, string> = {
 	INVALID_EMAIL_OR_PASSWORD: 'E-Mail-Adresse oder Passwort stimmen nicht.',
 	INVALID_EMAIL: 'Das ist keine gültige E-Mail-Adresse.',
+	INVALID_PASSWORD: 'Das Passwort stimmt nicht.',
 	PASSWORD_TOO_SHORT: 'Das Passwort braucht mindestens 8 Zeichen.',
 	PASSWORD_TOO_LONG: 'Das Passwort ist zu lang.',
 	USER_ALREADY_EXISTS: 'Zu dieser E-Mail-Adresse gibt es schon ein Konto.',

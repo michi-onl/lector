@@ -1,5 +1,5 @@
 import { planOf } from '#lib/plan.js';
-import { createAuth } from '#lib/server/auth.js';
+import { authMessage, createAuth } from '#lib/server/auth.js';
 import { evaluation } from '#lib/server/calibration.js';
 import { getDb } from '#lib/server/db/index.js';
 import { user } from '#lib/server/db/schema.js';
@@ -27,6 +27,23 @@ export const actions: Actions = {
 			.set({ plan, updatedAt: new Date() })
 			.where(eq(user.id, locals.user.id));
 		return { plan };
+	},
+	/** Removes the account with everything in D1 and R2, confirmed with the password. */
+	loeschen: async ({ locals, request, url }) => {
+		if (!locals.user) redirect(303, '/anmelden?weiter=/konto');
+		const password = String((await request.formData()).get('password') ?? '');
+		if (!password) return fail(400, { deleteMessage: 'Bitte gib dein Passwort ein.' });
+		try {
+			await createAuth(url.origin).api.deleteUser({
+				body: { password },
+				headers: request.headers
+			});
+		} catch (error) {
+			const deleteMessage = authMessage(error);
+			if (!deleteMessage) throw error;
+			return fail(400, { deleteMessage });
+		}
+		redirect(303, '/');
 	},
 	abmelden: async ({ request, url }) => {
 		await createAuth(url.origin).api.signOut({ headers: request.headers });

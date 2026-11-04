@@ -11,3 +11,14 @@ export function documentKeys(userId: string, documentId: string) {
 export function userPrefix(userId: string) {
 	return `users/${userId}/`;
 }
+
+/** Removes every object of a user, page by page; R2 lists and deletes up to 1,000 at a time. */
+export async function deleteUserObjects(bucket: R2Bucket, userId: string) {
+	let cursor: string | undefined;
+	for (;;) {
+		const page = await bucket.list({ prefix: userPrefix(userId), cursor });
+		if (page.objects.length) await bucket.delete(page.objects.map((object) => object.key));
+		if (!page.truncated) return;
+		cursor = page.cursor;
+	}
+}

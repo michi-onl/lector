@@ -7,16 +7,19 @@
 	import { Badge } from '#lib/components/ui/badge/index.js';
 	import { Button } from '#lib/components/ui/button/index.js';
 	import * as Card from '#lib/components/ui/card/index.js';
+	import { Input } from '#lib/components/ui/input/index.js';
+	import { Label } from '#lib/components/ui/label/index.js';
 	import { libraryFor, transferLibrary } from '#lib/library/index.js';
 	import { listLibrary } from '#lib/library/store.js';
 	import { FREE_MAXIMUM_WPM } from '#lib/plan.js';
 	import { loadLocalPreferences, PREFERENCES_KEY } from '#lib/preferences/store.js';
 	import ArrowsClockwise from 'phosphor-svelte/lib/ArrowsClockwise';
 	import Check from 'phosphor-svelte/lib/Check';
+	import DownloadSimple from 'phosphor-svelte/lib/DownloadSimple';
 	import SignOut from 'phosphor-svelte/lib/SignOut';
 	import type { PageProps } from './$types';
 
-	let { data }: PageProps = $props();
+	let { data, form }: PageProps = $props();
 
 	const user = $derived(data.user!);
 	const pro = $derived(user.plan === 'pro');
@@ -198,5 +201,55 @@
 			{/if}
 		{/if}
 		<Button href="/kalibrierung" variant="secondary" class="self-start">Neu kalibrieren</Button>
+	</section>
+
+	<section class="flex flex-col gap-4">
+		<h2 class="font-heading text-2xl font-bold">Deine Daten</h2>
+		<Card.Root>
+			<Card.Header>
+				<Card.Title>Daten herunterladen</Card.Title>
+				<Card.Description>
+					Alles aus deinem Konto als JSON-Datei, mit deinen Texten. Originaldateien lädst du einzeln
+					in der Bibliothek herunter.
+				</Card.Description>
+			</Card.Header>
+			<Card.Footer>
+				<Button href="/api/export" variant="secondary" data-sveltekit-reload>
+					<DownloadSimple />Herunterladen
+				</Button>
+			</Card.Footer>
+		</Card.Root>
+		<Card.Root>
+			<Card.Header>
+				<Card.Title>Konto löschen</Card.Title>
+				<Card.Description>
+					Löscht dein Konto mit allen Texten, Dateien und Auswertungen endgültig. Was in diesem
+					Browser gespeichert ist, bleibt hier; das löschst du in der Bibliothek.
+				</Card.Description>
+			</Card.Header>
+			<Card.Footer>
+				<form method="POST" action="?/loeschen" use:enhance class="flex w-full flex-col gap-3">
+					<div class="flex max-w-sm flex-col gap-2">
+						<Label for="delete-password">Passwort zur Bestätigung</Label>
+						<Input
+							id="delete-password"
+							name="password"
+							type="password"
+							autocomplete="current-password"
+							required
+							aria-describedby={form?.deleteMessage ? 'delete-error' : undefined}
+						/>
+					</div>
+					{#if form?.deleteMessage}
+						<p id="delete-error" class="text-sm text-destructive" role="alert">
+							{form.deleteMessage}
+						</p>
+					{/if}
+					<Button type="submit" variant="destructive" class="self-start">
+						Konto endgültig löschen
+					</Button>
+				</form>
+			</Card.Footer>
+		</Card.Root>
 	</section>
 </main>
