@@ -53,7 +53,8 @@
 		<p>
 			Importierst du einen Webartikel, schickt dein Browser die Adresse an unseren Server. Er lädt
 			die Seite, gibt den Text zurück und speichert dabei nichts. Die fremde Seite sieht dabei
-			Cloudflare als Besucher, nicht dich.
+			Cloudflare als Besucher, nicht dich. Damit niemand diese Funktion massenhaft auslöst, zählt
+			Cloudflare die Abrufe pro IP-Adresse für eine Minute; wir speichern die Adresse dabei nicht.
 		</p>
 	</section>
 
@@ -73,7 +74,8 @@
 		</p>
 		<p>
 			Wir speichern diese Daten, solange dein Konto besteht. Texte löschst du selbst in der
-			Bibliothek. Möchtest du dein Konto mit allen Daten löschen, schreib uns eine E-Mail.
+			Bibliothek. Auf der Kontoseite lädst du alle Daten deines Kontos herunter und löschst das
+			Konto mit allen Daten.
 		</p>
 	</section>
 
@@ -106,7 +108,7 @@
 		</p>
 	</section>
 
-	<p class="text-sm text-muted-foreground">Stand: Oktober 2026</p>
+	<p class="text-sm text-muted-foreground">Stand: November 2026</p>
 </main>
 
 <SiteFooter />

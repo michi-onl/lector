@@ -1,6 +1,6 @@
 # Prototyp: Aufbau und Funktionen
 
-Stand: 19. Oktober 2026. Dieses Dokument beschreibt, was der Prototyp kann, wie er aufgebaut ist und wie man ihn in der Präsentation vorführt. Produkt und Preise stehen in [`SPEC.md`](../SPEC.md), die Herkunft der Leseengine in [`fovea-sichtung.md`](fovea-sichtung.md).
+Stand: 4. November 2026. Dieses Dokument beschreibt, was der Prototyp kann, wie er aufgebaut ist und wie man ihn in der Präsentation vorführt. Produkt und Preise stehen in [`SPEC.md`](../SPEC.md), die Herkunft der Leseengine in [`fovea-sichtung.md`](fovea-sichtung.md).
 
 ## Funktionen und Seiten
 
@@ -14,7 +14,7 @@ Stand: 19. Oktober 2026. Dieses Dokument beschreibt, was der Prototyp kann, wie 
 | `/preise`                    | Tarife Free, Pro, Business/Edu und Rechner für gesparte Lesestunden                                           |
 | `/impressum`, `/datenschutz` | Pflichtangaben und Datenschutzerklärung, vorgerendert; die Angaben zum Betreiber stehen in `src/lib/legal.ts` |
 | `/registrieren`, `/anmelden` | Konto mit E-Mail und Passwort                                                                                 |
-| `/konto`                     | Tarif wechseln, Browser-Daten ins Konto übernehmen, Auswertung aller Quizantworten (Pro)                      |
+| `/konto`                     | Tarif wechseln, Browser-Daten übernehmen, Auswertung (Pro), Daten herunterladen, Konto löschen                |
 | `/praesentation`             | Erste Folie: Das Team stellt sich per RSVP vor, mit 300, 500 und 700 WPM                                      |
 | `/live`                      | Live-Demo anlegen oder per Code beitreten                                                                     |
 | `/live/[code]`               | Handyansicht für das Publikum: Fragen beantworten, eigenes Ergebnis sehen                                     |
@@ -93,7 +93,7 @@ flowchart LR
 | DOCX   | mammoth liefert den Text absatzweise.                                                                                                                                                                                                                                                                                 |
 | EPUB   | `zip.ts` entpackt mit dem `DecompressionStream` des Browsers, `epub.ts` folgt `container.xml` und dem Spine der OPF-Datei und liest jedes Kapitel mit `DOMParser`. Inhaltsverzeichnis, Fußnoten und Seitenmarker entfallen; jedes Kapitel endet mit einer Kapitelpause. E-Books mit DRM werden mit Hinweis abgelehnt. |
 | TXT    | UTF-8, sonst Windows-1252; Leerzeilen trennen Absätze.                                                                                                                                                                                                                                                                |
-| URL    | Der Worker lädt höchstens 5 MB, beachtet den Zeichensatz, Readability findet den Artikel, Fußnotenmarker wie „[2]“ entfallen.                                                                                                                                                                                         |
+| URL    | Der Worker lädt nur öffentliche Adressen und prüft dabei jede Weiterleitung, höchstens 20 Abrufe pro Minute und IP-Adresse. Er lädt höchstens 5 MB, beachtet den Zeichensatz, Readability findet den Artikel, Fußnotenmarker wie „[2]“ entfallen.                                                                     |
 
 Das Format erkennt Lector an den ersten Bytes, nicht am Dateinamen; nur DOCX verrät sich als ZIP-Archiv erst durch die Endung. Grenzen: 50 MB pro Datei, 1.000 PDF-Seiten, 5 Mio. Zeichen Text.
 
@@ -111,13 +111,13 @@ Das Schema steht in `src/lib/server/db/schema.ts`, die Migrationen in `migration
 | `reading_profile`                                 | Verständnisgrenze, Verständnisquote, Sicherheit; jede Kalibrierung legt eine Version an  |
 | `live_session`, `live_participant`, `live_answer` | Live-Demo: Runden, Phase, Teilnehmende per Zufalls-ID, eine Antwort pro Frage            |
 
-In R2 liegen pro Text `users/<id>/documents/<id>/model.json` (die Textblöcke) und `…/source` (das Original). Derselbe Text wird pro Konto nur einmal gespeichert (SHA-256).
+In R2 liegen pro Text `users/<id>/documents/<id>/model.json` (die Textblöcke) und `…/source` (das Original). Derselbe Text wird pro Konto nur einmal gespeichert (SHA-256). Beim Löschen eines Kontos räumt Lector zuerst das Präfix `users/<id>/` in R2 ab, die Zeilen in D1 folgen per Kaskade.
 
 Der Lesefortschritt wächst in einer einzigen SQL-Anweisung (`word_ms = word_ms + ?`), damit zwei Geräte oder überlappende Speichervorgänge keine Lesezeit verlieren.
 
 ## API
 
-Alle Endpunkte außer dem URL-Import und der Live-Demo verlangen ein Pro-Konto.
+Alle Endpunkte außer dem URL-Import, der Live-Demo und dem Export verlangen ein Pro-Konto. Den Export gibt es für jedes Konto. Konten löscht die Aktion `?/loeschen` auf `/konto`, immer mit Passwort; die Route `/api/auth/delete-user` von Better Auth ist abgeschaltet, weil sie bei frischer Sitzung ohne Passwort löschen würde.
 
 | Methode und Pfad                    | Zweck                                                     |
 | ----------------------------------- | --------------------------------------------------------- |
@@ -130,6 +130,7 @@ Alle Endpunkte außer dem URL-Import und der Live-Demo verlangen ein Pro-Konto.
 | `GET`, `POST /api/profile`          | Leseprofil lesen, aus dem Browser übernehmen              |
 | `POST /api/calibrations`            | abgeschlossene Kalibrierung speichern                     |
 | `GET`, `POST /api/live/[code]`      | Live-Demo abfragen; beitreten, antworten, weiterschalten  |
+| `GET /api/export`                   | alle Daten des Kontos als JSON mit Texten, ohne Originale |
 
 ## Live-Demo in der Präsentation
 
@@ -146,7 +147,7 @@ Für den Einstieg `/praesentation` öffnen und mit **F** auf Vollbild schalten. 
 
 ## Tests
 
-`npm test` prüft die Leseengine, die Kalibrierung, die Bibliotheksregeln, die PDF-Layoutheuristiken, den EPUB-Import, die Artikelextraktion, die serverseitige Prüfung von Kalibrierungsläufen und die Regeln der Live-Demo (206 Tests). Durchgespielt im Browser wurden: Import von PDF, DOCX, TXT und Wikipedia-Artikel, Registrierung, Wechsel zu Pro mit Übernahme der Browser-Bibliothek, Upload und Download des Originals, Kalibrierung mit Speicherung und Auswertung, die Team-Vorstellung und eine Live-Demo mit drei Handys über zwei Runden.
+`npm test` prüft die Leseengine, die Kalibrierung, die Bibliotheksregeln, die PDF-Layoutheuristiken, den EPUB-Import, die Artikelextraktion, die Adressprüfung des URL-Imports, die serverseitige Prüfung von Kalibrierungsläufen und die Regeln der Live-Demo (251 Tests). `src/lib/server/testing.ts` stellt dafür D1 als SQLite mit den echten Migrationen und R2 im Arbeitsspeicher bereit; so laufen Bibliothek, Live-Demo, Export und Kontolöschung gegen echtes SQL samt Kaskaden, ohne Cloudflare-Konto. Durchgespielt im Browser wurden: Import von PDF, DOCX, TXT und Wikipedia-Artikel, Registrierung, Wechsel zu Pro mit Übernahme der Browser-Bibliothek, Upload und Download des Originals, Kalibrierung mit Speicherung und Auswertung, die Team-Vorstellung und eine Live-Demo mit drei Handys über zwei Runden.
 
 ## Bekannte Grenzen
 
@@ -156,4 +157,5 @@ Für den Einstieg `/praesentation` öffnen und mit **F** auf Vollbild schalten. 
 - **Keine Passwort-Zurücksetzung** und keine E-Mail-Bestätigung; dafür fehlt ein Mailversand.
 - **Fragen nur zu den Kalibrierungstexten.** KI-generierte Fragen zu eigenen Texten sind eine Ausbaustufe.
 - **Hell oder dunkel folgt dem System.** Eine eigene Wahl in den Einstellungen fehlt noch; der Reader-Hintergrund (Creme, Weiß, Sepia, Nacht) bleibt davon unabhängig.
-- **Konto löschen** ist nicht umgesetzt; D1 löscht abhängige Zeilen per Kaskade, R2-Objekte lägen unter `users/<id>/`.
+- **Export ohne Originale.** Die JSON-Datei enthält die Texte; Originaldateien lädt Pro einzeln in der Bibliothek herunter.
+- **Abruflimit grob.** Cloudflare zählt pro Standort und nicht exakt; das Limit bremst Massenabrufe, keine einzelnen Anfragen.
