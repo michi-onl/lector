@@ -18,9 +18,10 @@ Voraussetzung ist Node.js 22.17 oder neuer.
 ```sh
 npm install
 echo "BETTER_AUTH_SECRET=$(openssl rand -base64 32)" > .dev.vars
-npx wrangler d1 migrations apply lector --local
 npm run dev
 ```
+
+`npm run dev` wendet vorher neue Migrationen auf die lokale Datenbank an.
 
 Die App läuft dann unter <http://localhost:5173>. D1 und R2 laufen lokal in `.wrangler/`.
 

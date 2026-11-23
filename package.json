@@ -4,6 +4,7 @@
 	"version": "0.0.1",
 	"type": "module",
 	"scripts": {
+		"predev": "wrangler d1 migrations apply lector --local",
 		"dev": "vite dev",
 		"build": "npm run gen -- --check && vite build",
 		"preview": "wrangler dev .svelte-kit/cloudflare/_worker.js --port 4173",
