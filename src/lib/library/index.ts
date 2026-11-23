@@ -27,7 +27,7 @@ const accountLibrary: Library = {
 	list: remote.listLibrary,
 	add: async (document) => (await remote.addDocument(document)).entry,
 	open: remote.openDocument,
-	record: (documentId, update) => remote.recordProgress(documentId, update),
+	record: remote.recordProgress,
 	remove: remote.removeDocument
 };
 

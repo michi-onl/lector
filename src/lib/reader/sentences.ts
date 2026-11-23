@@ -26,7 +26,6 @@ const CONNECTING = new Set(['bzw', 'ca', 'vgl', 'inkl', 'zzgl', 'bspw', 'sog']);
  * only before lower case, never before a capital or a digit (N6, N9).
  */
 const SENTENCE_FINAL_CAPABLE = new Set(['jr', 'sr', 'st', 'fr', 'evtl', 'ggf', 'vs']);
-const ABBREVIATIONS = new Set([...TITLES, ...CONNECTING, ...SENTENCE_FINAL_CAPABLE]);
 /**
  * May end a sentence or continue it, often before a (capitalized German) noun. Followed by a
  * capital, the boundary is uncertain. A short, fixed list; unlisted abbreviations are caught
@@ -105,20 +104,6 @@ const bareWord = (token: string | undefined) =>
 		.replace(OPENING, '')
 		.replace(/[.,;:!?…]+$/u, '')
 		.replace(TRAILING, '');
-
-/** A token that, by itself, is an abbreviation whose period is part of it (never a year). */
-export function isAbbreviation(token: string): boolean {
-	const core = token.replace(OPENING, '').replace(TRAILING, '');
-	if (!core.endsWith('.') || core.endsWith('..')) return false;
-	const stem = core.slice(0, -1);
-	const lower = stem.toLocaleLowerCase();
-	return (
-		/^\p{Ll}$/u.test(stem) ||
-		/^(\p{L}\.)+\p{L}$/u.test(stem) ||
-		ABBREVIATIONS.has(lower) ||
-		OPEN_ENDED.has(lower)
-	);
-}
 
 /** Complete initials that only ever continue a sentence ("z. B.", "d. h.", "e.g.", "i.e."). */
 const NEVER_FINAL_INITIALS = new Set(['zb', 'dh', 'eg', 'ie']);
@@ -330,11 +315,6 @@ function nextEvidence(token: string, following: string[]): NextEvidence {
  * It is text-flow state (D.11): callers carry it from block to block (scanEnclosure).
  */
 export type EnclosureState = readonly string[];
-/**
- * The state after text of unconfirmed order or membership that may have opened or closed a
- * quotation (D.13): treated as open, and never closed by any mark.
- */
-export const UNKNOWN_ENCLOSURE: EnclosureState = ['?'];
 type Enclosure = string[];
 /**
  * An apostrophe at a word start that elides, not quotes: before a digit ("'90s", "‘20") or in
@@ -348,18 +328,11 @@ const ELISION = /^(\d|(s|em|cause|til|tis|twas)(?![\p{L}\p{N}]))/iu;
  * opener ("'90 people came. …'", "'Til the end …'") then opens a real quotation (D.12, F3);
  * without one it stays an elision ("the '90s").
  */
-function enclose(
-	stack: Enclosure,
-	token: string,
-	closerAhead = false,
-	unmatched?: string[]
-): Enclosure {
+function enclose(stack: Enclosure, token: string, closerAhead = false): Enclosure {
 	const next = [...stack];
 	const close = (closer: string) => {
 		const at = next.lastIndexOf(closer);
 		if (at >= 0) next.splice(at);
-		else unmatched?.push(closer);
-		return at >= 0;
 	};
 	const chars = [...token];
 	for (const [index, char] of chars.entries()) {
@@ -385,20 +358,17 @@ function enclose(
 		} else if (char === '»' || char === '«') {
 			if (next.includes(char)) close(char);
 			else if (first) next.push(char === '»' ? '«' : '»');
-			else if (last) unmatched?.push(char);
 		} else if (char === '"' || char === "'") {
 			const elision = char === "'" && !closerAhead && ELISION.test(chars.slice(index + 1).join(''));
 			if (last && next.includes(char)) close(char);
 			else if (first && !last && !elision) next.push(char);
-			// A straight double quote at a word end with nothing to close closes something earlier.
-			else if (char === '"' && last && !first) unmatched?.push(char);
 		}
 	}
 	return next;
 }
 
 /** The enclosure after every token of a text, starting from `initial`. */
-function enclosures(tokens: string[], initial: EnclosureState, unmatched?: string[]): Enclosure[] {
+function enclosures(tokens: string[], initial: EnclosureState): Enclosure[] {
 	// Whether a single closing quote (at a word end) follows each token in this block.
 	const closerAhead = tokens.map(() => false);
 	for (let index = tokens.length - 2; index >= 0; index--)
@@ -407,7 +377,7 @@ function enclosures(tokens: string[], initial: EnclosureState, unmatched?: strin
 	const states: Enclosure[] = [];
 	let state = [...initial];
 	for (const [index, token] of tokens.entries())
-		states.push((state = enclose(state, token, closerAhead[index], unmatched)));
+		states.push((state = enclose(state, token, closerAhead[index])));
 	return states;
 }
 
@@ -417,20 +387,6 @@ function enclosures(tokens: string[], initial: EnclosureState, unmatched?: strin
  */
 export function scanEnclosure(text: string, state: EnclosureState = []): EnclosureState {
 	return enclosures(tokensOf(text), state).at(-1) ?? [...state];
-}
-
-/**
- * The balance of quotation marks and brackets of a text after `state` (D.14): the closing
- * marks that nothing opened (the text continues a quotation begun before it) and the
- * marks still open after it (a quotation that goes on after it).
- */
-export function enclosureBalance(
-	text: string,
-	state: EnclosureState = []
-): { unmatched: string[]; open: EnclosureState } {
-	const unmatched: string[] = [];
-	const open = enclosures(tokensOf(text), state, unmatched).at(-1) ?? [...state];
-	return { unmatched, open };
 }
 
 /** Collects the evidence for the boundary after a token; decides nothing. */

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import Logo from '#lib/components/logo.svelte';
 	import { Badge } from '#lib/components/ui/badge/index.js';
 	import { Button } from '#lib/components/ui/button/index.js';
 	import * as Card from '#lib/components/ui/card/index.js';
@@ -155,8 +156,7 @@
 	function onPointerMove(e: PointerEvent) {
 		const rect = svg.getBoundingClientRect();
 		const vx = ((e.clientX - rect.left) / rect.width) * W;
-		const wpm = 200 + ((vx - m.left) / (W - m.left - m.right)) * 600;
-		const i = Math.round((wpm - 200) / 100);
+		const i = Math.round(((vx - m.left) / (W - m.left - m.right)) * 6);
 		hover = i >= 0 && i < speeds.length ? i : null;
 	}
 
@@ -186,7 +186,7 @@
 <div class="mx-auto flex max-w-6xl flex-col gap-6 p-6">
 	<header class="flex items-center justify-between gap-4">
 		<div class="flex items-baseline gap-3">
-			<span class="font-heading text-3xl font-bold">Lect<span class="text-primary">o</span>r</span>
+			<Logo class="text-3xl" />
 			<span class="text-sm text-muted-foreground">Theme-Beispiel</span>
 		</div>
 		<div class="flex items-center gap-2">

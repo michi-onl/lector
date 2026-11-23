@@ -82,12 +82,8 @@ export interface SmartTimingState {
 	actualElapsed: number;
 }
 
-export type SmartTimingResetType = 'NONE' | 'SMOOTHING_RESET' | 'FULL_TIMING_RESET';
-
 export interface TokenTiming {
 	delayMs: number;
-	baseTimeMs: number;
-	rawFactor: number;
 	state: SmartTimingState;
 }
 
@@ -105,9 +101,8 @@ export function initialTimingState(settings: ReadingSettings): SmartTimingState 
 	};
 }
 
-export function resetTiming(state: SmartTimingState, type: SmartTimingResetType): SmartTimingState {
-	if (type === 'NONE') return state;
-	if (type === 'SMOOTHING_RESET') return { ...state, previousDelay: null };
+/** Drops smoothing and the rolling budget, e.g. after a seek, jump or pause. */
+export function resetTiming(state: SmartTimingState): SmartTimingState {
 	return { ...state, previousDelay: null, targetElapsed: 0, actualElapsed: 0 };
 }
 
@@ -189,29 +184,16 @@ export function timeToken(
 	const base = baseTimeMs(settings.targetWpm);
 	if (!enabled) {
 		const delay = clampDelay(base, base);
-		return { delayMs: Math.round(delay), baseTimeMs: base, rawFactor: 1, state };
+		return { delayMs: Math.round(delay), state };
 	}
 	let rawFactor: number;
 	try {
 		rawFactor = rawTimingFactor(text, boundaryAfter);
 	} catch {
 		// A failing token falls back to the constant base time; the reader keeps going.
-		return { delayMs: Math.round(base), baseTimeMs: base, rawFactor: 1, state };
+		return { delayMs: Math.round(base), state };
 	}
-	const stages = timingStages(shapeToken(text), boundaryAfter, rawFactor, state);
-	return { delayMs: stages.delayMs, baseTimeMs: base, rawFactor, state: stages.state };
-}
-
-/** The intermediate values of the delay pipeline for one token, in pipeline order. */
-export interface TimingStages {
-	/** base × raw factor after the delay clamp. */
-	rawDelayMs: number;
-	smoothedDelayMs: number;
-	correctionMs: number;
-	/** A sentence-end or boundary delay or a long word: smoothing does not apply either way. */
-	bypass: boolean;
-	delayMs: number;
-	state: SmartTimingState;
+	return timingStages(shapeToken(text), boundaryAfter, rawFactor, state);
 }
 
 /**
@@ -219,12 +201,12 @@ export interface TimingStages {
  * correction, final clamp. `timeToken` runs it with the raw factor; the state must belong to
  * the current target WPM with Smart Timing on. Pure and deterministic.
  */
-export function timingStages(
+function timingStages(
 	token: TokenShape,
 	boundaryAfter: StructureBoundary,
 	rawFactor: number,
 	state: SmartTimingState
-): TimingStages {
+): TokenTiming {
 	const config = SMART_TIMING_CONFIG;
 	const base = baseTimeMs(state.targetWpm);
 	const raw = clampDelay(base * rawFactor, base);
@@ -254,10 +236,6 @@ export function timingStages(
 		Math.max(-limit, targetElapsed - (state.actualElapsed + delay))
 	);
 	return {
-		rawDelayMs: raw,
-		smoothedDelayMs: smoothed,
-		correctionMs: correction,
-		bypass,
 		delayMs: delay,
 		state: {
 			...state,

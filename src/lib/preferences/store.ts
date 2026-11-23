@@ -1,5 +1,6 @@
 import { api } from '#lib/api.js';
-import { loadProfile, type StoredProfile } from '#lib/calibration/profile.js';
+import { loadProfile } from '#lib/calibration/profile.js';
+import { loadProfileFor } from '#lib/calibration/store.js';
 import { appearanceFor, syncs, type Plan } from '#lib/plan.js';
 import { parsePreferences, type Preferences } from './preferences.js';
 
@@ -38,7 +39,7 @@ export async function loadPreferences(plan: Plan): Promise<Preferences> {
 	if (!syncs(plan)) return appearanceFor(plan, loadLocalPreferences(localStorage));
 	const stored = await api<Preferences | null>('/api/settings').catch(() => null);
 	if (stored) return stored;
-	const profile = await api<StoredProfile | null>('/api/profile').catch(() => null);
+	const profile = await loadProfileFor(plan);
 	return {
 		...loadLocalPreferences(localStorage),
 		...(profile && { targetWpm: profile.targetWpm })

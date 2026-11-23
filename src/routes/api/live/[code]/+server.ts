@@ -1,5 +1,5 @@
 import { normalizeCode, validParticipant } from '#lib/live/live.js';
-import { getDb } from '#lib/server/db/index.js';
+import { getDb, type Database } from '#lib/server/db/index.js';
 import {
 	advanceLiveSession,
 	findLiveSession,
@@ -11,8 +11,8 @@ import { error, json } from '@sveltejs/kit';
 import { env } from 'cloudflare:workers';
 import type { RequestHandler } from './$types';
 
-async function session(code: string) {
-	const found = await findLiveSession(getDb(env.DB), normalizeCode(code));
+async function session(db: Database, code: string) {
+	const found = await findLiveSession(db, normalizeCode(code));
 	if (!found) error(404, 'Diese Live-Demo gibt es nicht.');
 	return found;
 }
@@ -20,8 +20,9 @@ async function session(code: string) {
 /** Polled by the projector and the phones; `?p=` names the phone. */
 export const GET: RequestHandler = async ({ locals, params, url }) => {
 	const participant = url.searchParams.get('p');
+	const db = getDb(env.DB);
 	return json(
-		await liveView(getDb(env.DB), await session(params.code), {
+		await liveView(db, await session(db, params.code), {
 			userId: locals.user?.id,
 			participantId: validParticipant(participant) ? participant : undefined
 		}),
@@ -31,7 +32,7 @@ export const GET: RequestHandler = async ({ locals, params, url }) => {
 
 export const POST: RequestHandler = async ({ locals, params, request }) => {
 	const db = getDb(env.DB);
-	const found = await session(params.code);
+	const found = await session(db, params.code);
 	const body = (await request.json().catch(() => null)) as Record<string, unknown> | null;
 	switch (body?.action) {
 		case 'advance':

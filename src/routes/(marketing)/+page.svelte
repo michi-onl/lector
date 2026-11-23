@@ -1,8 +1,6 @@
 <script lang="ts">
 	import Logo from '#lib/components/logo.svelte';
 	import RsvpDemo from '#lib/components/reader/rsvp-demo.svelte';
-	import SiteFooter from '#lib/components/site-footer.svelte';
-	import SiteHeader from '#lib/components/site-header.svelte';
 	import { Button } from '#lib/components/ui/button/index.js';
 	import { FREE_MAXIMUM_WPM } from '#lib/plan.js';
 	import ArrowCounterClockwise from 'phosphor-svelte/lib/ArrowCounterClockwise';
@@ -51,8 +49,6 @@
 		content="Lector zeigt dir Texte Wort für Wort, so schnell, wie du sie noch verstehst. Für PDFs, Word-Dateien und Webartikel."
 	/>
 </svelte:head>
-
-<SiteHeader prerendered />
 
 <main class="mx-auto flex max-w-5xl flex-col gap-20 p-6 pb-20">
 	<section class="flex flex-col gap-10 pt-8">
@@ -114,5 +110,3 @@
 		<Button href="/preise" class="justify-self-start">Preise ansehen</Button>
 	</section>
 </main>
-
-<SiteFooter />

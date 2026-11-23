@@ -52,6 +52,7 @@ const LTR =
 	/[\p{Script=Latin}\p{Script=Greek}\p{Script=Cyrillic}\p{Script=Armenian}\p{Script=Georgian}]/u;
 const UNIT =
 	'(?:km|cm|mm|nm|µm|m|kg|mg|g|t|ml|l|km/h|m/s|m²|m³|°C|°F|K|Hz|kHz|MHz|GHz|kB|MB|GB|TB|kW|kWh|W|V|mA|A|dB|ms|s|min|h)';
+const UNIT_VALUE = new RegExp(`^[+−-]?\\d+(?:[.,]\\d+)?\\s?${UNIT}$`, 'u');
 const STANDALONE_UNITS = new Set([
 	'km',
 	'cm',
@@ -115,11 +116,7 @@ function specialOf(core: string, display: string): SpecialToken | null {
 	)
 		return 'date';
 	if (/^\d{1,2}:\d{2}(?::\d{2})?(?:h|Uhr)?$/iu.test(core)) return 'time';
-	if (
-		new RegExp(`^[+−-]?\\d+(?:[.,]\\d+)?\\s?${UNIT}$`, 'u').test(core) ||
-		STANDALONE_UNITS.has(core)
-	)
-		return 'unit';
+	if (UNIT_VALUE.test(core) || STANDALONE_UNITS.has(core)) return 'unit';
 	if (/^\d{1,4}$/u.test(core)) return 'simple-number';
 	if (
 		/^[+−-]?\d[\d.,'’\u202f]*(?:[%‰€$£]|[–-]\d[\d.,]*)?$/u.test(core) ||

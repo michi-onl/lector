@@ -1,4 +1,4 @@
-import { planOf } from '#lib/plan.js';
+import { planOf, syncs } from '#lib/plan.js';
 import { authMessage, createAuth } from '#lib/server/auth.js';
 import { evaluation } from '#lib/server/calibration.js';
 import { getDb } from '#lib/server/db/index.js';
@@ -11,8 +11,7 @@ import type { Actions, PageServerLoad } from './$types';
 export const load: PageServerLoad = async ({ locals }) => {
 	if (!locals.user) redirect(303, '/anmelden?weiter=/konto');
 	return {
-		evaluation:
-			planOf(locals.user) === 'pro' ? await evaluation(getDb(env.DB), locals.user.id) : null
+		evaluation: syncs(planOf(locals.user)) ? await evaluation(getDb(env.DB), locals.user.id) : null
 	};
 };
 

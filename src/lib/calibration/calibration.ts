@@ -32,6 +32,13 @@ export interface CalibrationResult {
 
 const DEPTHS: QuestionDepth[] = ['recall', 'understanding', 'relation'];
 
+/** The deepest kind of question a text asks; undefined for a text without questions. */
+export function deepestDepth(text: CalibrationText): QuestionDepth | undefined {
+	return DEPTHS.filter((candidate) =>
+		text.questions.some((question) => question.depth === candidate)
+	).at(-1);
+}
+
 /** Scores one run. A skip is the answer „Weiß ich nicht“: not wrong, but not understood. */
 export function scoreRun(text: CalibrationText, wpm: number, answers: Answers): CalibrationRun {
 	if (answers.length !== text.questions.length)
@@ -40,9 +47,7 @@ export function scoreRun(text: CalibrationText, wpm: number, answers: Answers): 
 	const correct = answers.filter(
 		(answer, index) => answer === text.questions[index].correctIndex
 	).length;
-	const depth = DEPTHS.filter((candidate) =>
-		text.questions.some((question) => question.depth === candidate)
-	).at(-1);
+	const depth = deepestDepth(text);
 	if (!depth) throw new Error('A calibration text needs questions.');
 	return {
 		textId: text.id,

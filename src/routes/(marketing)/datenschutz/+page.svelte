@@ -1,6 +1,4 @@
 <script lang="ts">
-	import SiteFooter from '#lib/components/site-footer.svelte';
-	import SiteHeader from '#lib/components/site-header.svelte';
 	import { operator } from '#lib/legal.js';
 
 	const heading = 'font-heading text-xl font-bold';
@@ -9,8 +7,6 @@
 <svelte:head>
 	<title>Datenschutz · Lector</title>
 </svelte:head>
-
-<SiteHeader prerendered />
 
 <main class="mx-auto flex max-w-3xl flex-col gap-8 p-6 pb-16 [&_p]:leading-relaxed">
 	<div class="flex flex-col gap-2">
@@ -110,5 +106,3 @@
 
 	<p class="text-sm text-muted-foreground">Stand: November 2026</p>
 </main>
-
-<SiteFooter />

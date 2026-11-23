@@ -12,7 +12,11 @@
 	import { libraryFor, transferLibrary } from '#lib/library/index.js';
 	import { listLibrary } from '#lib/library/store.js';
 	import { FREE_MAXIMUM_WPM } from '#lib/plan.js';
-	import { loadLocalPreferences, PREFERENCES_KEY } from '#lib/preferences/store.js';
+	import {
+		loadLocalPreferences,
+		PREFERENCES_KEY,
+		savePreferences
+	} from '#lib/preferences/store.js';
 	import ArrowsClockwise from 'phosphor-svelte/lib/ArrowsClockwise';
 	import Check from 'phosphor-svelte/lib/Check';
 	import DownloadSimple from 'phosphor-svelte/lib/DownloadSimple';
@@ -57,7 +61,7 @@
 				transfer.message = `Text ${Math.min(done + 1, total)} von ${total} …`;
 			});
 			if (localStorage.getItem(PREFERENCES_KEY))
-				await api('/api/settings', { method: 'PUT', json: loadLocalPreferences(localStorage) });
+				await savePreferences('pro', loadLocalPreferences(localStorage));
 			const local = loadProfile(localStorage);
 			if (local) await api('/api/profile', { method: 'POST', json: local });
 			transfer = {

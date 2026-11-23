@@ -1,4 +1,4 @@
-import type { DocumentFormat } from '#lib/library/library.js';
+import type { NewDocument } from '#lib/library/library.js';
 import { textBlocks, type TextBlock } from '#lib/reader/index.js';
 import {
 	decodeText,
@@ -15,14 +15,8 @@ export * from './files.js';
  * What an import hands to the library. Extraction runs in the browser: Workers have little
  * memory and CPU time per request, and Free needs no server for its library.
  */
-export interface ImportedDocument {
+export interface ImportedDocument extends NewDocument {
 	title: string;
-	format: DocumentFormat;
-	blocks: TextBlock[];
-	fileName?: string;
-	sourceUrl?: string;
-	/** The original file; Pro keeps it in R2. */
-	source?: Blob;
 }
 
 export function blocksFromParagraphs(paragraphs: string[]): TextBlock[] {

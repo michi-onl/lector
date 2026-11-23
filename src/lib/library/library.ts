@@ -118,6 +118,11 @@ export function emptyProgress(documentId: string, now = new Date()): LibraryProg
 	};
 }
 
+/** Where the reader stands after an update: the end once completed, else the word clamped to the text. */
+export function readingPosition(update: ReadingUpdate, total: number): number {
+	return update.completed ? total : Math.max(0, Math.min(total, update.wordIndex));
+}
+
 /** Adds what was read; the first completion is kept, later rereads do not move it. */
 export function recordReading(
 	progress: LibraryProgress,
@@ -125,7 +130,7 @@ export function recordReading(
 	total: number,
 	now = new Date()
 ): LibraryProgress {
-	const position = update.completed ? total : Math.max(0, Math.min(total, update.wordIndex));
+	const position = readingPosition(update, total);
 	return {
 		...progress,
 		position,
@@ -156,7 +161,7 @@ export function sortEntries(entries: LibraryEntry[]): LibraryEntry[] {
 /** What an account may store per text: about a thousand pages. */
 export const MAX_TEXT_CHARACTERS = 5_000_000;
 
-const FORMATS: readonly DocumentFormat[] = ['pdf', 'docx', 'epub', 'txt', 'url', 'text'];
+const FORMATS = Object.keys(FORMAT_LABELS) as DocumentFormat[];
 const BOUNDARIES: readonly StructureBoundary[] = [
 	'none',
 	'sentence',

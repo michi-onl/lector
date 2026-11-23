@@ -39,8 +39,7 @@
 		if (player?.isRunning() || done) {
 			done = false;
 			player?.restart();
-		} else if (segment > 0) segment--;
-		else segment = -1;
+		} else segment--;
 	}
 
 	function onkeydown(event: KeyboardEvent) {

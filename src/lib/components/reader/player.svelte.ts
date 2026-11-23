@@ -74,7 +74,7 @@ export class Player {
 			transition.presentedIndex === null ? [] : this.units[transition.presentedIndex].words;
 		if (moved || finished || presented.length || transition.activeMilliseconds)
 			this.#options.onprogress?.({
-				wordIndex: this.completed ? this.totalWords : (this.unit?.wordIndex ?? 0),
+				wordIndex: this.wordsRead,
 				completed: this.completed,
 				activeMs: transition.activeMilliseconds,
 				words: presented.length

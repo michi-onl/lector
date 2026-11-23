@@ -1,6 +1,8 @@
 import {
 	canonicalText,
 	deriveTitle,
+	emptyProgress,
+	readingPosition,
 	sha256,
 	wordCount,
 	type LibraryEntry,
@@ -8,7 +10,7 @@ import {
 	type NewDocument,
 	type ReadingUpdate
 } from '#lib/library/library.js';
-import { buildPresentation, type TextBlock } from '#lib/reader/index.js';
+import type { TextBlock } from '#lib/reader/index.js';
 import { and, desc, eq, sql } from 'drizzle-orm';
 import type { Database } from './db/index.js';
 import { document, progress } from './db/schema.js';
@@ -90,13 +92,20 @@ export async function createDocument(
 	const id = crypto.randomUUID();
 	const keys = documentKeys(userId, id);
 	const model: StoredModel = { analyzerVersion: ANALYZER_VERSION, blocks: input.blocks };
-	await bucket.put(keys.model, JSON.stringify(model), {
-		httpMetadata: { contentType: 'application/json' }
-	});
-	if (input.source)
-		await bucket.put(keys.source, await input.source.arrayBuffer(), {
-			httpMetadata: { contentType: input.source.type || 'application/octet-stream' }
-		});
+	const source = input.source;
+	await Promise.all([
+		bucket.put(keys.model, JSON.stringify(model), {
+			httpMetadata: { contentType: 'application/json' }
+		}),
+		source &&
+			source.arrayBuffer().then((bytes) =>
+				bucket.put(keys.source, bytes, {
+					httpMetadata: { contentType: source.type || 'application/octet-stream' }
+				})
+			)
+	]);
+	// With one word per unit, the units are the words.
+	const words = wordCount(input.blocks);
 	const now = new Date();
 	const [[row]] = await db.batch([
 		db
@@ -113,8 +122,8 @@ export async function createDocument(
 				sourceKey: input.source ? keys.source : null,
 				modelKey: keys.model,
 				analyzerVersion: ANALYZER_VERSION,
-				wordCount: wordCount(input.blocks),
-				unitCount: buildPresentation(input.blocks).length,
+				wordCount: words,
+				unitCount: words,
 				createdAt: now,
 				updatedAt: now
 			})
@@ -142,17 +151,7 @@ export async function openDocument(db: Database, bucket: R2Bucket, userId: strin
 	return {
 		entry: toEntry(row),
 		blocks: model.blocks,
-		progress: saved
-			? toProgress(saved)
-			: toProgress({
-					documentId: id,
-					position: 0,
-					maxPosition: 0,
-					wordMs: 0,
-					wordPresentations: 0,
-					completedAt: null,
-					updatedAt: row.createdAt
-				})
+		progress: saved ? toProgress(saved) : emptyProgress(id, row.createdAt)
 	};
 }
 
@@ -187,7 +186,7 @@ export async function recordProgress(
 		.get();
 	if (!row) return false;
 	const total = row.wordCount;
-	const position = update.completed ? total : Math.max(0, Math.min(total, update.wordIndex));
+	const position = readingPosition(update, total);
 	const now = new Date();
 	await db.batch([
 		db.insert(progress).values({ documentId: id, updatedAt: now }).onConflictDoNothing(),

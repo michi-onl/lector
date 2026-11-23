@@ -37,8 +37,6 @@
 	let settings = $state(
 		untrack(() => ({ ...preferences, targetWpm: Math.min(preferences.targetWpm, limit) }))
 	);
-	/** The calibrated speed lies beyond what the tariff reads. */
-	const capped = untrack(() => profile !== null && profile.targetWpm > limit);
 	const saver = untrack(() => preferenceSaver(plan));
 	let pending: ReadingUpdate | null = null;
 	let first = true;
@@ -70,7 +68,7 @@
 <svelte:window onpagehide={save} />
 <svelte:document onvisibilitychange={() => document.visibilityState === 'hidden' && save()} />
 
-{#if capped && profile}
+{#if profile && profile.targetWpm > limit}
 	<Alert.Root>
 		<Lightning />
 		<Alert.Title>Du verstehst Texte noch bei {profile.targetWpm} WPM.</Alert.Title>

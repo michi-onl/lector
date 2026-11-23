@@ -1,17 +1,16 @@
 import {
 	CALIBRATION_TEXTS,
+	deepestDepth,
 	evaluateCalibration,
 	passed,
+	profileFrom,
 	type CalibrationRun,
-	type QuestionDepth,
 	type StoredProfile
 } from '#lib/calibration/index.js';
 import { clampWpm } from '#lib/reader/settings.js';
 import { and, asc, desc, eq, isNotNull } from 'drizzle-orm';
 import type { Database } from './db/index.js';
 import { calibration, measurement, readingProfile } from './db/schema.js';
-
-const DEPTHS: QuestionDepth[] = ['recall', 'understanding', 'relation'];
 
 /**
  * Checks runs sent by a browser against the calibration texts: known text, each text once,
@@ -35,9 +34,7 @@ export function parseRuns(value: unknown): CalibrationRun[] | null {
 		const [speed, right, given, left] = counts as number[];
 		if (clampWpm(speed) !== speed || right > given || given + left !== text.questions.length)
 			return null;
-		const depth = DEPTHS.filter((candidate) =>
-			text.questions.some((question) => question.depth === candidate)
-		).at(-1)!;
+		const depth = deepestDepth(text)!;
 		runs.push({
 			textId: text.id,
 			wpm: speed,
@@ -97,13 +94,7 @@ export async function saveCalibration(
 				]
 			: [])
 	]);
-	return result.targetWpm !== null && result.comprehension !== null
-		? {
-				targetWpm: result.targetWpm,
-				comprehension: result.comprehension,
-				calibratedAt: now.toISOString()
-			}
-		: null;
+	return profileFrom(result, now);
 }
 
 export async function latestProfile(db: Database, userId: string): Promise<StoredProfile | null> {

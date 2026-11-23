@@ -15,18 +15,24 @@ export const PROFILE_KEY = 'lector.profile';
 
 type ProfileStorage = Pick<Storage, 'getItem' | 'setItem'>;
 
-/** Only a result with a limit becomes the profile; otherwise the previous one stays. */
+/** Only a result with a limit becomes a profile. */
+export function profileFrom(result: CalibrationResult, now: Date): StoredProfile | null {
+	if (result.targetWpm === null || result.comprehension === null) return null;
+	return {
+		targetWpm: result.targetWpm,
+		comprehension: result.comprehension,
+		calibratedAt: now.toISOString()
+	};
+}
+
+/** Without a limit the previous profile stays. */
 export function saveProfile(
 	storage: ProfileStorage,
 	result: CalibrationResult,
 	now = new Date()
 ): StoredProfile | null {
-	if (result.targetWpm === null || result.comprehension === null) return null;
-	const profile: StoredProfile = {
-		targetWpm: result.targetWpm,
-		comprehension: result.comprehension,
-		calibratedAt: now.toISOString()
-	};
+	const profile = profileFrom(result, now);
+	if (!profile) return null;
 	storage.setItem(PROFILE_KEY, JSON.stringify(profile));
 	return profile;
 }

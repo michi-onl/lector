@@ -22,7 +22,11 @@
 
 	const poll = new LivePoll(untrack(() => data.code));
 	const view = $derived(poll.view);
-	const current = $derived(view ? view.rounds[view.round] : undefined);
+	const current = $derived(view?.rounds[view.round]);
+	// Plain values first, so a poll that changes nothing does not rebuild the presentation.
+	const text = $derived(view?.text);
+	const blocks = $derived(text ? textBlocks(text) : []);
+	const wpm = $derived(current?.wpm ?? 300);
 	let player = $state<StagePlayer>();
 	let read = $state(false);
 	let advancing = $state(false);
@@ -31,7 +35,7 @@
 	const settings = $derived({
 		...DEFAULT_PREFERENCES,
 		background: 'night' as const,
-		targetWpm: current?.wpm ?? 300,
+		targetWpm: wpm,
 		fontSize: Math.round(Math.min(144, Math.max(48, width / 11)))
 	});
 	const percent = (share: number) => `${Math.round(share * 100)} %`;
@@ -106,7 +110,7 @@
 			{#key view.round}
 				<StagePlayer
 					bind:this={player}
-					blocks={textBlocks(view.text)}
+					{blocks}
 					{settings}
 					completedText="Fertig gelesen"
 					class="min-h-[50svh] flex-1"

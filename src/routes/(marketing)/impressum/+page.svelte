@@ -1,14 +1,10 @@
 <script lang="ts">
-	import SiteFooter from '#lib/components/site-footer.svelte';
-	import SiteHeader from '#lib/components/site-header.svelte';
 	import { operator } from '#lib/legal.js';
 </script>
 
 <svelte:head>
 	<title>Impressum · Lector</title>
 </svelte:head>
-
-<SiteHeader prerendered />
 
 <main class="mx-auto flex max-w-3xl flex-col gap-8 p-6 pb-16">
 	<h1 class="font-heading text-3xl font-bold">Impressum</h1>
@@ -40,5 +36,3 @@
 		</p>
 	</section>
 </main>
-
-<SiteFooter />

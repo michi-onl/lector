@@ -6,13 +6,7 @@ import {
 	type StructureBoundary
 } from './presentation.js';
 import type { ReadingSettings } from './settings.js';
-import {
-	initialTimingState,
-	resetTiming,
-	timeToken,
-	type SmartTimingResetType,
-	type SmartTimingState
-} from './timing.js';
+import { initialTimingState, resetTiming, timeToken, type SmartTimingState } from './timing.js';
 
 /**
  * The reader state model, ported from Fovea without visuals and in-text questions. One phase
@@ -119,7 +113,8 @@ export function transitionReader(
 		structuralMilliseconds: 0,
 		...extra
 	});
-	const reset = (type: SmartTimingResetType) => resetTiming(timing, type);
+	// Seeks, jumps and starts interrupt the continuous timing context.
+	const clean = resetTiming(timing);
 	const unchanged = result({ state, timing });
 	const unit = units[state.index];
 	if (!unit) return unchanged;
@@ -129,15 +124,13 @@ export function transitionReader(
 			if (!Number.isFinite(index)) return unchanged;
 			return result({
 				state: { index, phase: { kind: 'ready' } },
-				timing: reset('FULL_TIMING_RESET')
+				timing: clean
 			});
 		}
 		case 'jump': {
 			const index = findJumpIndex(units, state.index, command.direction, command.level);
 			const isLargeJump = !['word', 'sentence'].includes(command.level);
 			const wasPlaying = state.phase.kind === 'playing' || state.phase.kind === 'structure';
-			// Every jump interrupts the continuous timing context.
-			const clean = reset('FULL_TIMING_RESET');
 			if (isLargeJump) return result({ state: { index, phase: { kind: 'ready' } }, timing: clean });
 			const timed = timeUnit(units[index], settings, clean);
 			// Sentence rewind during playback goes on playing from the sentence start.
@@ -148,7 +141,7 @@ export function transitionReader(
 		}
 		case 'start': {
 			if (state.phase.kind === 'ready')
-				return result(phaseForUnit(state.index, units, settings, reset('FULL_TIMING_RESET')));
+				return result(phaseForUnit(state.index, units, settings, clean));
 			if (state.phase.kind !== 'paused') return unchanged;
 			const paused = state.phase;
 			const phase: ReaderPhase =
@@ -160,7 +153,7 @@ export function transitionReader(
 						}
 					: { kind: 'playing', remainingMs: paused.remainingMs };
 			// Resuming after a user pause carries no old smoothing or budget.
-			return result({ state: { ...state, phase }, timing: reset('FULL_TIMING_RESET') });
+			return result({ state: { ...state, phase }, timing: clean });
 		}
 		case 'pause': {
 			const phase = state.phase;

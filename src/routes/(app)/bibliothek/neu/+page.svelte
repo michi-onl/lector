@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
+	import { api, ApiError } from '#lib/api.js';
 	import type { StoredProfile } from '#lib/calibration/index.js';
 	import { loadProfileFor } from '#lib/calibration/store.js';
 	import * as Alert from '#lib/components/ui/alert/index.js';
@@ -109,18 +110,12 @@
 		event.preventDefault();
 		void open(async () => {
 			busy = 'Artikel wird geladen …';
-			const response = await fetch('/api/import/url', {
-				method: 'POST',
-				headers: { 'content-type': 'application/json' },
-				body: JSON.stringify({ url })
+			const body = await api<{ title: string; paragraphs: string[]; sourceUrl: string }>(
+				'/api/import/url',
+				{ method: 'POST', json: { url } }
+			).catch((error) => {
+				throw error instanceof ApiError ? new ImportError(error.message) : error;
 			});
-			const body: {
-				message?: string;
-				title: string;
-				paragraphs: string[];
-				sourceUrl: string;
-			} = await response.json();
-			if (!response.ok) throw new ImportError(body.message ?? 'Der Artikel ließ sich nicht laden.');
 			return {
 				blocks: blocksFromParagraphs(body.paragraphs),
 				format: 'url',
@@ -203,7 +198,7 @@
 			<FileArrowUp class="size-10 text-primary" />
 			<span class="font-medium">Datei auswählen oder hierher ziehen</span>
 			<span class="text-sm text-muted-foreground">
-				{#if plan === 'pro'}
+				{#if allowsFormat(plan, 'docx')}
 					PDF, Word (DOCX), E-Book (EPUB) oder TXT, bis {MAX_FILE_BYTES / 1024 / 1024} MB. Lector liest
 					den Text in deinem Browser aus und speichert das Original in deinem Konto.
 				{:else}
