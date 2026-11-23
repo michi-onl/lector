@@ -7,6 +7,7 @@
 	import {
 		CALIBRATION_LADDER,
 		CALIBRATION_TEXTS,
+		DEMO_LADDER,
 		evaluateCalibration,
 		nextWpm,
 		passed,
@@ -51,13 +52,14 @@
 	let failed = $state(false);
 
 	const plan = $derived(planOf(page.data.user));
+	const ladder = $derived(page.url.searchParams.has('demo') ? DEMO_LADDER : CALIBRATION_LADDER);
 	const limit = $derived(maximumWpm(plan));
 
 	function settingsAt(targetWpm: number): Preferences {
 		return { ...appearance, speedMode: 'adaptive', chunkSize: 1, targetWpm };
 	}
 
-	const wpm = $derived(nextWpm(runs));
+	const wpm = $derived(nextWpm(runs, ladder));
 	const text = $derived(texts[runs.length]);
 	const complete = $derived(
 		text && answers.length === text.questions.length && answers.every(Boolean)
@@ -109,7 +111,7 @@
 		if (!complete || wpm === null) return;
 		const choices = answers.map((answer) => (answer === SKIP ? null : Number(answer)));
 		runs = [...runs, scoreRun(text, wpm, choices)];
-		if (nextWpm(runs) !== null) {
+		if (nextWpm(runs, ladder) !== null) {
 			step = 'reading';
 			return;
 		}
@@ -125,7 +127,7 @@
 
 {#if step === 'reading' || step === 'questions'}
 	<p class="-mb-4 text-sm text-muted-foreground">
-		Text {runs.length + 1} von höchstens {CALIBRATION_LADDER.length}
+		Text {runs.length + 1} von höchstens {ladder.length}
 	</p>
 {/if}
 
@@ -134,8 +136,8 @@
 		<h1 class="font-heading text-3xl font-bold">Finde dein Lesetempo</h1>
 		<p>
 			Lector zeigt dir nacheinander kurze Texte und erhöht dabei das Tempo, von
-			{CALIBRATION_LADDER[0]} bis höchstens {CALIBRATION_LADDER.at(-1)} Wörter pro Minute. Nach jedem
-			Text beantwortest du zwei Fragen zum Inhalt. Hast du zweimal nicht genug verstanden, endet die Kalibrierung.
+			{ladder[0]} bis höchstens {ladder.at(-1)} Wörter pro Minute. Nach jedem Text beantwortest du zwei
+			Fragen zum Inhalt. Hast du zweimal nicht genug verstanden, endet die Kalibrierung.
 		</p>
 		<p class="text-muted-foreground">
 			Das Tempo ist während eines Textes fest, pausieren kannst du jederzeit. Wenn du eine Antwort
@@ -153,7 +155,12 @@
 		</div>
 	</section>
 {:else if step === 'practice'}
-	<p class="text-muted-foreground">Probelauf mit {PRACTICE_WPM} WPM, ohne Wertung.</p>
+	<div class="flex flex-wrap items-center justify-between gap-3">
+		<p class="text-muted-foreground">Probelauf mit {PRACTICE_WPM} WPM, ohne Wertung.</p>
+		<Button variant="ghost" onclick={() => (step = 'reading')}>
+			<ArrowRight />Probelauf überspringen
+		</Button>
+	</div>
 	<Reader
 		blocks={textBlocks(PRACTICE_TEXT)}
 		settings={settingsAt(PRACTICE_WPM)}
@@ -164,8 +171,7 @@
 	<section class="flex flex-col gap-4">
 		<h1 class="font-heading text-3xl font-bold">So liest Lector.</h1>
 		<p class="text-muted-foreground">
-			Jetzt beginnt die Messung mit {CALIBRATION_LADDER[0]} WPM. Jeder Text startet erst, wenn du auf
-			„Lesen“ tippst.
+			Jetzt beginnt die Messung mit {ladder[0]} WPM. Jeder Text startet erst, wenn du auf „Lesen“ tippst.
 		</p>
 		<div class="flex flex-wrap gap-3">
 			<Button onclick={() => (step = 'reading')}><ArrowRight />Zum ersten Text</Button>
@@ -243,8 +249,7 @@
 			<div class="flex flex-col gap-2">
 				<h1 class="font-heading text-3xl font-bold">Noch keine Grenze gefunden</h1>
 				<p class="text-muted-foreground">
-					Schon bei {CALIBRATION_LADDER[0]} WPM war kein Text vollständig verstanden. Probiere es in Ruhe
-					noch einmal{previous
+					Schon bei {ladder[0]} WPM war kein Text vollständig verstanden. Probiere es in Ruhe noch einmal{previous
 						? `; bis dahin bleibt dein bisheriges Tempo von ${previous.targetWpm} WPM`
 						: ''}.
 				</p>

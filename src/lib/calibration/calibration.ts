@@ -6,6 +6,12 @@ import type { CalibrationText, QuestionDepth } from './texts.js';
  */
 export const CALIBRATION_LADDER = [200, 300, 400, 500, 600, 700] as const;
 
+/**
+ * For live demos (`/kalibrierung?demo`): the first text at twice the usual start speed, then
+ * on up the normal ladder, so the runs still rise.
+ */
+export const DEMO_LADDER = CALIBRATION_LADDER.filter((wpm) => wpm >= 2 * CALIBRATION_LADDER[0]);
+
 /** One missed run can be a slip; the second one ends the calibration. */
 export const ALLOWED_MISSES = 1;
 
@@ -69,9 +75,12 @@ function misses(runs: CalibrationRun[]): number {
 }
 
 /** The speed of the next run, or null when the calibration is over. */
-export function nextWpm(runs: CalibrationRun[]): number | null {
+export function nextWpm(
+	runs: CalibrationRun[],
+	ladder: readonly number[] = CALIBRATION_LADDER
+): number | null {
 	if (misses(runs) > ALLOWED_MISSES) return null;
-	return CALIBRATION_LADDER[runs.length] ?? null;
+	return ladder[runs.length] ?? null;
 }
 
 /**

@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
 	CALIBRATION_LADDER,
 	evaluateCalibration,
+	DEMO_LADDER,
 	nextWpm,
 	passed,
 	scoreRun,
@@ -82,6 +83,11 @@ describe('nextWpm', () => {
 		expect(nextWpm([])).toBe(200);
 		expect(nextWpm(runs(2, 2))).toBe(400);
 		expect(nextWpm(runs(2, 1, 2))).toBe(500);
+	});
+
+	it('starts a demo at twice the speed and keeps rising', () => {
+		expect(nextWpm([], DEMO_LADDER)).toBe(400);
+		expect(nextWpm(runs(2, 2), DEMO_LADDER)).toBe(600);
 	});
 
 	it('ends at the second miss or at the top of the ladder', () => {

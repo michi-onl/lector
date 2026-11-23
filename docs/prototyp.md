@@ -11,6 +11,7 @@ Stand: 4. November 2026. Dieses Dokument beschreibt, was der Prototyp kann, wie 
 | `/bibliothek/neu`            | Neuer Text: einfügen, Datei hochladen (PDF, DOCX, EPUB, TXT) oder Webartikel per URL importieren              |
 | `/lesen/[id]`                | Reader mit ORP, adaptivem Tempo, Satz-Rewind, Chunk-Modus, optischer Anpassung und Volltext                   |
 | `/kalibrierung`              | Quiz-Kalibrierung: bis zu sechs Texte von 200 bis 700 WPM, Verständnisgrenze und Veränderung zur letzten      |
+| `/kalibrierung?demo`         | Für Vorführungen: erster Text mit 400 statt 200 WPM, danach weiter aufwärts bis 700 WPM                       |
 | `/preise`                    | Tarife Free, Pro, Business/Edu und Rechner für gesparte Lesestunden                                           |
 | `/impressum`, `/datenschutz` | Pflichtangaben und Datenschutzerklärung, vorgerendert; die Angaben zum Betreiber stehen in `src/lib/legal.ts` |
 | `/registrieren`, `/anmelden` | Konto mit E-Mail und Passwort                                                                                 |
